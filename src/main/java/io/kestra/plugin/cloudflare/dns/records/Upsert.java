@@ -85,7 +85,7 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
         Integer recordTtl = runContext.render(ttl).as(Integer.class).orElseThrow();
         Boolean recordProxied = runContext.render(proxied).as(Boolean.class).orElseThrow();
         String base = runContext.render(this.getBaseUrl()).as(String.class).orElseThrow();
-        
+
         var listRequest = HttpRequest.builder()
             .method(GET.name())
             .uri(URI.create(base + "/zones/" + zone +
