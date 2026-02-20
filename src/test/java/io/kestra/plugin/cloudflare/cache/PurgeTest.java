@@ -36,7 +36,7 @@ class PurgeTest {
             .apiToken(Property.ofValue("test-token"))
             .baseUrl(Property.ofValue("http://localhost:28181"))
             .zoneId(Property.ofValue("test-zone"))
-            .purgeEverything(Property.ofValue(true))
+            .purgeAll(Property.ofValue(true))
             .build();
 
         Purge.Output output = task.run(runContextFactory.of());
