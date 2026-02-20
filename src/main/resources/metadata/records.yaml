@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.dns.records
+name: "records"
+title: "DNS Records"
+description: "Tasks that manage Cloudflare DNS records."
+body: "Create, retrieve, update, delete, list, batch, and upsert DNS records within Cloudflare zones. Supports common record types such as A, AAAA, CNAME, TXT, MX, and more for full DNS automation."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"

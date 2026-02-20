@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.compute.kv
+name: "kv"
+title: "Cloudflare Workers KV"
+description: "Tasks that manage Cloudflare Workers KV key-value storage."
+body: "Write, retrieve, delete, and list key-value pairs within Workers KV namespaces. Supports bulk operations and expiration settings for feature flags, edge configuration, distributed state, and application-level automation."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"
