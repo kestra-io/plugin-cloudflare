@@ -19,6 +19,7 @@ import lombok.experimental.SuperBuilder;
 import org.slf4j.Logger;
 
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -114,18 +115,23 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
             logger.info("Creating account-level access rule for target '{}' with mode '{}'", targetVal, modeValue);
         }
 
+        Map<String, Object> payload = new LinkedHashMap<>();
+
+        payload.put("mode", modeValue.name().toLowerCase(Locale.ROOT));
+        payload.put("configuration", Map.of(
+            "target", targetValue.name().toLowerCase(Locale.ROOT),
+            "value", targetVal
+        ));
+
+        if (noteVal != null && !noteVal.isBlank()) {
+            payload.put("notes", noteVal);
+        }
+
         var requestBuilder = HttpRequest.builder()
             .method("POST")
             .uri(URI.create(base + scopePath + "/firewall/access_rules/rules"))
             .body(HttpRequest.JsonRequestBody.builder()
-                .content(Map.of(
-                    "mode", modeValue.name().toLowerCase(Locale.ROOT),
-                    "configuration", Map.of(
-                        "target", targetValue.name().toLowerCase(Locale.ROOT),
-                        "value", targetVal
-                    ),
-                    "notes", noteVal
-                ))
+                .content(payload)
                 .build());
 
         HttpResponse<CloudflareEnvelope<AccessRuleResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<AccessRuleResponse>>() {});
