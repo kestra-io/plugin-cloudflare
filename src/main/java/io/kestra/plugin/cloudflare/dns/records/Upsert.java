@@ -85,8 +85,7 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
         Integer recordTtl = runContext.render(ttl).as(Integer.class).orElseThrow();
         Boolean recordProxied = runContext.render(proxied).as(Boolean.class).orElseThrow();
         String base = runContext.render(this.getBaseUrl()).as(String.class).orElseThrow();
-
-        // 1️⃣ Search existing record
+        
         var listRequest = HttpRequest.builder()
             .method(GET.name())
             .uri(URI.create(base + "/zones/" + zone +
@@ -106,7 +105,6 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
         body.put("ttl", recordTtl);
         body.put("proxied", recordProxied);
 
-        // 2️⃣ If exists → PATCH
         if (existing != null && !existing.isEmpty()) {
 
             String recordId = existing.get(0).id();
@@ -126,7 +124,6 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
             return buildOutput(patchResponse.getBody(), "updated");
         }
 
-        // 3️⃣ Otherwise → CREATE
         logger.info("Record does not exist, creating...");
 
         var createRequest = HttpRequest.builder()
@@ -179,6 +176,6 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
         private final String content;
         private final Integer ttl;
         private final Boolean proxied;
-        private final String action; // created | updated
+        private final String action;
     }
 }
