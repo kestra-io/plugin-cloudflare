@@ -40,7 +40,7 @@ class WriteTest {
             .baseUrl(Property.ofValue("http://localhost:28181"))
             .accountId(Property.ofValue("test-account"))
             .namespaceId(Property.ofValue("ns_123"))
-            .pairs(Property.ofValue(List.of(
+            .keyValues(Property.ofValue(List.of(
                 new Write.KVPair("k1", "v1"),
                 new Write.KVPair("k2", "v2")
             )))

@@ -69,7 +69,7 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
         description = "List of key-value pairs to store."
     )
     @NotNull
-    private Property<List<KVPair>> pairs;
+    private Property<List<KVPair>> keyValues;
 
     @Override
     public Output run(RunContext runContext) throws IllegalVariableEvaluationException, HttpClientException {
@@ -78,7 +78,7 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
         String rBaseUrl = runContext.render(this.getBaseUrl()).as(String.class).orElseThrow();
         String rAccountId = runContext.render(accountId).as(String.class).orElseThrow();
         String rNamespaceId = runContext.render(namespaceId).as(String.class).orElseThrow();
-        List<KVPair> rPairs = runContext.render(pairs).asList(KVPair.class);
+        List<KVPair> rPairs = runContext.render(keyValues).asList(KVPair.class);
 
         logger.info("Writing {} KV entries into namespace '{}'", rPairs.size(), rNamespaceId);
 
@@ -90,9 +90,7 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
                 .content(rPairs)
                 .build());
 
-        HttpResponse<CloudflareEnvelope<BulkResponse>> response =
-            this.request(runContext, requestBuilder,
-                new TypeReference<CloudflareEnvelope<BulkResponse>>() {});
+        HttpResponse<CloudflareEnvelope<BulkResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<BulkResponse>>() {});
 
         var body = response.getBody();
 
@@ -108,8 +106,7 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
 
     public record KVPair(String key, String value) {}
 
-    public record BulkResponse(Integer successful_key_count,
-                               List<String> unsuccessful_keys) {}
+    public record BulkResponse(Integer successful_key_count, List<String> unsuccessful_keys) {}
 
     @Builder
     @Getter
