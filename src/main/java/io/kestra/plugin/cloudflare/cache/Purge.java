@@ -38,6 +38,9 @@ import java.util.Map;
             title = "Purge entire zone cache",
             full = true,
             code = """
+                id: purge_all_cache
+                namespace: company.team
+
                 tasks:
                   - id: purge_all
                     type: io.kestra.plugin.cloudflare.cache.Purge
@@ -50,6 +53,9 @@ import java.util.Map;
             title = "Purge specific files",
             full = true,
             code = """
+                id: purge_specific_files
+                namespace: company.team
+
                 tasks:
                   - id: purge_files
                     type: io.kestra.plugin.cloudflare.cache.Purge

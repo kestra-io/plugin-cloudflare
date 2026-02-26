@@ -34,6 +34,9 @@ import java.net.URI;
             title = "List zones",
             full = true,
             code = """
+                id: list_cloudflare_zones
+                namespace: company.team
+
                 tasks:
                   - id: list_zones
                     type: io.kestra.plugin.cloudflare.zones.List

@@ -38,6 +38,9 @@ import java.util.Map;
             title = "Block an IP",
             full = true,
             code = """
+                id: create_ip_access_rule
+                namespace: company.team
+
                 tasks:
                   - id: block_ip
                     type: io.kestra.plugin.cloudflare.waf.accessrules.Create

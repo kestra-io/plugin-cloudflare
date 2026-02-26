@@ -37,9 +37,12 @@ import java.util.Map;
             title = "Update DNS record content",
             full = true,
             code = """
+                id: update_dns_record
+                namespace: company.team
+
                 tasks:
                   - id: update_record
-                    recordType: io.kestra.plugin.cloudflare.dns.records.Update
+                    type: io.kestra.plugin.cloudflare.dns.records.Update
                     apiToken: "{{ secret('CLOUDFLARE_API_TOKEN') }}"
                     zoneId: "your_zone_id"
                     recordId: "abc123"

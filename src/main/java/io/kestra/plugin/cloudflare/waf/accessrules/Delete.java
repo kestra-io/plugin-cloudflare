@@ -36,9 +36,12 @@ import java.net.URI;
             title = "Delete rule at zone level",
             full = true,
             code = """
+                id: delete_ip_access_rule
+                namespace: company.team
+
                 tasks:
                   - id: delete_rule
-                    type: io.kestra.plugin.cloudflare.waf.accessrules.Create
+                    type: io.kestra.plugin.cloudflare.waf.accessrules.Delete
                     apiToken: "{{ secret('CLOUDFLARE_API_TOKEN') }}"
                     zoneId: "zone123"
                     ruleId: "92f17202ed8bd63d69a66b86a49a8f6b"

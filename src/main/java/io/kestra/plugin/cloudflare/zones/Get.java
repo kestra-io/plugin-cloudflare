@@ -36,6 +36,9 @@ import java.util.List;
             title = "Get zone by ID",
             full = true,
             code = """
+                id: get_zone_by_id
+                namespace: company.team
+
                 tasks:
                   - id: get_zone
                     type: io.kestra.plugin.cloudflare.zones.Get
@@ -47,6 +50,9 @@ import java.util.List;
             title = "Get zone by hostname",
             full = true,
             code = """
+                id: get_zone_by_hostname
+                namespace: company.team
+
                 tasks:
                   - id: get_zone
                     type: io.kestra.plugin.cloudflare.zones.Get

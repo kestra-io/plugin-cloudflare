@@ -42,7 +42,7 @@ import static org.apache.hc.core5.http.Method.POST;
 
                 tasks:
                   - id: create_record
-                    recordType: io.kestra.plugin.cloudflare.dns.records.Create
+                    type: io.kestra.plugin.cloudflare.dns.records.Create
                     apiToken: "{{ secret('CLOUDFLARE_API_TOKEN') }}"
                     zoneId: "your_zone_id"
                     recordType: "A"

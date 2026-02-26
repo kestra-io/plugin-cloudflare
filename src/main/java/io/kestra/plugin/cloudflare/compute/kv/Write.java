@@ -32,6 +32,9 @@ import java.util.List;
             title = "Write multiple KV pairs",
             full = true,
             code = """
+                id: bulk_write_kv_flow
+                namespace: company.team
+
                 tasks:
                   - id: bulk_write_kv
                     type: io.kestra.plugin.cloudflare.compute.kv.Write

@@ -35,6 +35,9 @@ import java.net.URI;
             title = "Get DNS record details",
             full = true,
             code = """
+                id: get_dns_record
+                namespace: company.team
+
                 tasks:
                   - id: get_record
                     type: io.kestra.plugin.cloudflare.dns.records.Get

@@ -40,9 +40,12 @@ import static org.apache.hc.core5.http.Method.*;
             title = "Ensure A record exists",
             full = true,
             code = """
+                id: upsert_dns_record
+                namespace: company.team
+
                 tasks:
                   - id: ensure_dns
-                    recordType: io.kestra.plugin.cloudflare.dns.records.Upsert
+                    type: io.kestra.plugin.cloudflare.dns.records.Upsert
                     apiToken: "{{ secret('CLOUDFLARE_API_TOKEN') }}"
                     zoneId: "your_zone_id"
                     recordType: "A"

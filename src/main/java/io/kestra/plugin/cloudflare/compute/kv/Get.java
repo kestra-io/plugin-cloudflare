@@ -33,6 +33,9 @@ import java.util.Map;
             title = "Get multiple KV values",
             full = true,
             code = """
+                id: bulk_get_kv_flow
+                namespace: company.team
+
                 tasks:
                   - id: bulk_get_kv
                     type: io.kestra.plugin.cloudflare.compute.kv.Get

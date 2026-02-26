@@ -36,6 +36,9 @@ import java.util.Map;
             title = "Create a Workers KV namespace",
             full = true,
             code = """
+                id: create_namespace_flow
+                namespace: company.team
+
                 tasks:
                   - id: create_namespace
                     type: io.kestra.plugin.cloudflare.compute.namespaces.Create

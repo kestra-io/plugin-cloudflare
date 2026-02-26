@@ -35,6 +35,9 @@ import java.net.URI;
             title = "Delete a DNS record",
             full = true,
             code = """
+                id: delete_dns_record
+                namespace: company.team
+
                 tasks:
                   - id: delete_record
                     type: io.kestra.plugin.cloudflare.dns.records.Delete

@@ -35,9 +35,12 @@ import java.net.URI;
             title = "List IP access rules for a zone",
             full = true,
             code = """
+                id: list_ip_access_rules
+                namespace: company.team
+
                 tasks:
                   - id: list_access_rules
-                    type: io.kestra.plugin.cloudflare.waf.accessrules.Create
+                    type: io.kestra.plugin.cloudflare.waf.accessrules.List
                     apiToken: "{{ secret('CLOUDFLARE_API_TOKEN') }}"
                     zoneId: "your_zone_id"
                 """
