@@ -106,7 +106,7 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
             listResponse.getBody() != null ? listResponse.getBody().result() : null;
 
         Map<String, Object> body = new HashMap<>();
-        body.put("type", rRecordType);
+        body.put("type", rRecordType.name());
         body.put("name", rName);
         body.put("content", rContent);
         body.put("ttl", rTtl);
@@ -138,9 +138,7 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
                 .content(body)
                 .build());
 
-        HttpResponse<CloudflareEnvelope<RecordResponse>> createResponse =
-            this.request(runContext, createRequest,
-                new TypeReference<CloudflareEnvelope<RecordResponse>>() {});
+        HttpResponse<CloudflareEnvelope<RecordResponse>> createResponse = this.request(runContext, createRequest, new TypeReference<CloudflareEnvelope<RecordResponse>>() {});
 
         return buildOutput(createResponse.getBody(), "created");
     }

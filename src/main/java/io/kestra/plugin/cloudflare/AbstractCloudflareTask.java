@@ -92,6 +92,7 @@ public abstract class AbstractCloudflareTask extends Task {
         NS,
         SRV,
         PTR,
-        CAA
+        CAA,
+        SOA
     }
 }
