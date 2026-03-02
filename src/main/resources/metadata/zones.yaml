@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.zones
+name: "zones"
+title: "Cloudflare Zones"
+description: "Tasks that manage Cloudflare zones."
+body: "Create, retrieve, update, list, and delete Cloudflare zones. Automate zone lifecycle management and configure domain-level settings securely using Cloudflare API tokens."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"

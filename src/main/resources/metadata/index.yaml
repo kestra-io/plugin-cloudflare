@@ -1,8 +1,8 @@
-group: io.kestra.plugin.template
-name: "template"
-title: "Template"
-description: "Plugin template for Kestra"
-body: ""
+group: io.kestra.plugin.cloudflare
+name: "cloudflare"
+title: "Cloudflare"
+description: "Tasks that manage Cloudflare zones, DNS records, and cache operations."
+body: "Create, update, list, and delete Cloudflare zones and DNS records. Purge entire zone cache or specific files, manage DNS configurations, and automate Cloudflare infrastructure operations securely using API tokens."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"

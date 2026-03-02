@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.cache
+name: "cache"
+title: "Cloudflare Cache"
+description: "Tasks that manage Cloudflare cache operations."
+body: "Purge entire zone cache or specific cached files and URLs. Automate cache invalidation workflows securely using Cloudflare API tokens."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"
