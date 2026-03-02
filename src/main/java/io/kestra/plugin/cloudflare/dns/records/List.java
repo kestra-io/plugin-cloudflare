@@ -26,8 +26,8 @@ import java.net.URI;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "List DNS records",
-    description = "Retrieves all DNS records for a Cloudflare zone."
+    title = "List Cloudflare DNS records",
+    description = "Lists DNS records for a zone using Cloudflare defaults (first page only)."
 )
 @Plugin(
     examples = {
@@ -50,7 +50,7 @@ import java.net.URI;
 public class List extends AbstractCloudflareTask implements RunnableTask<List.Output> {
 
     @NotNull
-    @Schema(title = "Zone ID", description = "Cloudflare zone identifier.")
+    @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
     private Property<String> zoneId;
 
     @Override
@@ -92,7 +92,7 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
 
-        @Schema(title = "DNS records")
+        @Schema(title = "DNS records", description = "Records returned for the zone")
         private final java.util.List<RecordResponse> records;
     }
 }

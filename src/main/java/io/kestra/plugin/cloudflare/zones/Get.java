@@ -27,8 +27,8 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Get Zone Details",
-    description = "Retrieve details of a Cloudflare zone using either its zone ID or its hostname. If both are provided, `zoneId` takes precedence."
+    title = "Fetch Cloudflare zone",
+    description = "Retrieves zone details by ID or hostname; zoneId wins when both are set. Hostname lookup returns the first matching zone and fails if none found."
 )
 @Plugin(
     examples = {
@@ -66,13 +66,13 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
 
     @Schema(
         title = "Zone ID",
-        description = "Unique identifier of the Cloudflare zone. If both `zoneId` and `hostname` are provided, `zoneId` takes priority."
+        description = "Cloudflare zone identifier; takes priority over hostname when both are provided"
     )
     private Property<String> zoneId;
 
     @Schema(
         title = "Zone hostname",
-        description = "The domain name of the Cloudflare zone (for example: example.com). Used to look up the zone if `zoneId` is not provided."
+        description = "Domain name of the zone used when zoneId is not provided"
     )
     private Property<String> hostname;
 
@@ -144,19 +144,19 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
 
         @Schema(
             title = "Zone ID",
-            description = "Unique identifier of the Cloudflare zone."
+            description = "Cloudflare zone identifier"
         )
         private final String id;
 
         @Schema(
             title = "Zone Name",
-            description = "Domain name associated with the zone."
+            description = "Domain name associated with the zone"
         )
         private final String name;
 
         @Schema(
             title = "Zone Status",
-            description = "Current status of the zone (for example: active, pending)."
+            description = "Current zone status (for example: active, pending)"
         )
         private final String status;
     }

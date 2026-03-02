@@ -27,8 +27,8 @@ import java.util.Map;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Create KV Namespace",
-    description = "Creates a new Workers KV namespace under an account."
+    title = "Create Workers KV namespace",
+    description = "Creates a Workers KV namespace in the target account using the provided title; task fails if Cloudflare does not return a namespace ID."
 )
 @Plugin(
     examples = {
@@ -53,14 +53,14 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
 
     @Schema(
         title = "Account ID",
-        description = "Cloudflare account identifier."
+        description = "Cloudflare account identifier"
     )
     @NotNull
     private Property<String> accountId;
 
     @Schema(
         title = "Namespace Title",
-        description = "Human-readable title for the namespace."
+        description = "Display title for the namespace shown in Cloudflare"
     )
     @NotNull
     private Property<String> title;
@@ -104,10 +104,10 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
 
-        @Schema(title = "Namespace ID", description = "Unique namespace identifier.")
+        @Schema(title = "Namespace ID", description = "Identifier of the created namespace")
         private final String namespaceId;
 
-        @Schema(title = "Title", description = "Namespace title.")
+        @Schema(title = "Title", description = "Title returned by Cloudflare")
         private final String title;
     }
 }

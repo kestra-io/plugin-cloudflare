@@ -50,20 +50,20 @@ import java.util.Map;
     }
 )
 @Schema(
-    title = "Bulk Get KV Pairs",
-    description = "Retrieves multiple key-value pairs from a KV namespace."
+    title = "Bulk read Workers KV items",
+    description = "Retrieves multiple keys from a Workers KV namespace in a single call; fails if Cloudflare bulk get is unsuccessful."
 )
 public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Output> {
 
-    @Schema(description = "Cloudflare account identifier.")
+    @Schema(title = "Account ID", description = "Cloudflare account identifier")
     @NotNull
     private Property<String> accountId;
 
-    @Schema(description = "Workers KV namespace identifier.")
+    @Schema(title = "Namespace ID", description = "Workers KV namespace identifier")
     @NotNull
     private Property<String> namespaceId;
 
-    @Schema(description = "List of keys to retrieve from the namespace.")
+    @Schema(title = "Keys", description = "Keys to retrieve from the namespace in bulk")
     @NotNull
     private Property<List<String>> keys;
 
@@ -103,7 +103,7 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Retrieved Values")
+        @Schema(title = "Retrieved Values", description = "Map of key to value returned by the namespace")
         private final Map<String, Object> values;
     }
 }

@@ -25,8 +25,8 @@ import java.net.URI;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "List Zones",
-    description = "List all Cloudflare zones associated with the account."
+    title = "List Cloudflare zones",
+    description = "Lists zones for the authenticated account using Cloudflare default pagination (first page only)."
 )
 @Plugin(
     examples = {
@@ -80,7 +80,7 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Zones")
+        @Schema(title = "Zones", description = "Zones returned by Cloudflare for the current page")
         private final java.util.List<ZoneResponse> zones;
     }
 }

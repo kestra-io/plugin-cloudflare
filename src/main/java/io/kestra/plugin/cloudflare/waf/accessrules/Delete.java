@@ -27,8 +27,8 @@ import java.net.URI;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Delete IP Access Rule",
-    description = "Deletes an existing Cloudflare IP Access rule at zone or account level."
+    title = "Delete Cloudflare IP access rule",
+    description = "Deletes an IP access rule scoped to either a zone or an account (exactly one required); fails if Cloudflare does not confirm deletion."
 )
 @Plugin(
     examples = {
@@ -53,19 +53,19 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
 
     @Schema(
         title = "Zone ID",
-        description = "Zone ID where the rule exists. Mutually exclusive with accountId."
+        description = "Zone ID where the rule exists; mutually exclusive with accountId"
     )
     private Property<String> zoneId;
 
     @Schema(
         title = "Account ID",
-        description = "Account ID where the rule exists. Mutually exclusive with zoneId."
+        description = "Account ID where the rule exists; mutually exclusive with zoneId"
     )
     private Property<String> accountId;
 
     @Schema(
         title = "Rule ID",
-        description = "Unique identifier of the IP Access rule to delete."
+        description = "Identifier of the IP access rule to delete"
     )
     @NotNull
     private Property<String> ruleId;
@@ -122,10 +122,10 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
 
-        @Schema(title = "Rule ID", description = "Identifier of the deleted rule.")
+        @Schema(title = "Rule ID", description = "Identifier of the deleted rule")
         private final String ruleId;
 
-        @Schema(title = "Deleted", description = "Whether the rule was successfully deleted.")
+        @Schema(title = "Deleted", description = "Whether Cloudflare confirmed deletion")
         private final Boolean deleted;
     }
 }

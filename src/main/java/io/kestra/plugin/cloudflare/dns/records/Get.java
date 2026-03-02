@@ -26,8 +26,8 @@ import java.net.URI;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Get DNS record details",
-    description = "Retrieve full details of a specific DNS record by its ID."
+    title = "Fetch Cloudflare DNS record",
+    description = "Retrieves DNS record details by ID within a zone; fails if Cloudflare does not return the record."
 )
 @Plugin(
     examples = {
@@ -50,11 +50,11 @@ import java.net.URI;
 )
 public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Output> {
 
-    @Schema(description = "Cloudflare zone identifier.")
+    @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
     @NotNull
     private Property<String> zoneId;
 
-    @Schema(description = "ID of the DNS record to fetch.")
+    @Schema(title = "Record ID", description = "ID of the DNS record to fetch")
     @NotNull
     private Property<String> recordId;
 
@@ -104,17 +104,17 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Record ID")
+        @Schema(title = "Record ID", description = "ID returned by Cloudflare")
         private final String recordId;
-        @Schema(title = "Name")
+        @Schema(title = "Name", description = "Record name")
         private final String name;
-        @Schema(title = "Type")
+        @Schema(title = "Type", description = "Record type")
         private final String type;
-        @Schema(title = "Content")
+        @Schema(title = "Content", description = "Record content value")
         private final String content;
-        @Schema(title = "TTL")
+        @Schema(title = "TTL", description = "Record TTL in seconds")
         private final Integer ttl;
-        @Schema(title = "Proxied")
+        @Schema(title = "Proxied", description = "Whether the record is proxied by Cloudflare")
         private final Boolean proxied;
     }
 }

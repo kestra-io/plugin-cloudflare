@@ -41,7 +41,7 @@ import java.util.List;
                     apiToken: "{{ secret('CLOUDFLARE_API_TOKEN') }}"
                     accountId: "your_account_id"
                     namespaceId: "your_namespace_id"
-                    pairs:
+                    keyValues:
                       - key: "feature_flag"
                         value: "enabled"
                       - key: "release_version"
@@ -51,22 +51,22 @@ import java.util.List;
     }
 )
 @Schema(
-    title = "Bulk Write KV Pairs",
-    description = "Writes multiple key-value pairs into a KV namespace."
+    title = "Bulk write Workers KV items",
+    description = "Writes multiple key-value pairs to a Workers KV namespace in one request; existing keys are overwritten and the task fails if Cloudflare reports unsuccessful writes."
 )
 public class Write extends AbstractCloudflareTask implements RunnableTask<Write.Output> {
 
-    @Schema(title = "Account ID", description = "Cloudflare account identifier.")
+    @Schema(title = "Account ID", description = "Cloudflare account ID that owns the namespace")
     @NotNull
     private Property<String> accountId;
 
-    @Schema(title = "Namespace ID", description = "Target KV namespace ID.")
+    @Schema(title = "Namespace ID", description = "Target Workers KV namespace ID")
     @NotNull
     private Property<String> namespaceId;
 
     @Schema(
         title = "Key-Value Pairs",
-        description = "List of key-value pairs to store."
+        description = "Entries to write; all are sent in one bulk request and overwrite existing values with the same key"
     )
     @NotNull
     private Property<List<KVPair>> keyValues;
@@ -112,10 +112,10 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
 
-        @Schema(title = "Successful Key Count")
+        @Schema(title = "Successful Key Count", description = "Number of keys Cloudflare confirmed written")
         private final Integer successfulKeyCount;
 
-        @Schema(title = "Unsuccessful Keys")
+        @Schema(title = "Unsuccessful Keys", description = "Keys Cloudflare reported as not written")
         private final List<String> unsuccessfulKeys;
     }
 }

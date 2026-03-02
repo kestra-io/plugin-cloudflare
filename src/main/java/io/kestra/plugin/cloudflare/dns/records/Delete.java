@@ -26,8 +26,8 @@ import java.net.URI;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Delete DNS record",
-    description = "Deletes a DNS record from a Cloudflare zone using its record ID."
+    title = "Delete Cloudflare DNS record",
+    description = "Deletes a DNS record by ID within a zone; fails if Cloudflare does not confirm deletion."
 )
 @Plugin(
     examples = {
@@ -51,11 +51,11 @@ import java.net.URI;
 public class Delete extends AbstractCloudflareTask implements RunnableTask<Delete.Output> {
 
     @NotNull
-    @Schema(title = "Zone ID", description = "Cloudflare zone identifier.")
+    @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
     private Property<String> zoneId;
 
     @NotNull
-    @Schema(title = "Record ID", description = "The ID of the DNS record to delete.")
+    @Schema(title = "Record ID", description = "DNS record ID to delete")
     private Property<String> recordId;
 
     @Override
@@ -90,7 +90,7 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Deleted Record ID")
+        @Schema(title = "Deleted Record ID", description = "ID confirmed deleted by Cloudflare")
         private final String deletedId;
     }
 }

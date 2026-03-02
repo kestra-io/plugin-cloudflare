@@ -26,8 +26,8 @@ import java.net.URI;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "List IP Access Rules",
-    description = "Lists all IP access rules configured for a specific Cloudflare zone."
+    title = "List Cloudflare IP access rules",
+    description = "Lists IP access rules for a zone using Cloudflare default pagination (first page only)."
 )
 @Plugin(
     examples = {
@@ -51,7 +51,7 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
 
     @Schema(
         title = "Zone ID",
-        description = "Unique identifier of the Cloudflare zone."
+        description = "Cloudflare zone identifier"
     )
     @NotNull
     private Property<String> zoneId;
@@ -88,7 +88,7 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
 
         @Schema(
             title = "Access Rules",
-            description = "List of IP access rules configured for the zone."
+            description = "IP access rules returned for the zone"
         )
         private final java.util.List<Create.AccessRuleResponse> rules;
     }

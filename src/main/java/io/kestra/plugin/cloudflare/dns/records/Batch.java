@@ -30,8 +30,8 @@ import java.util.Objects;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Batch DNS record operations",
-    description = "Create, update, or delete multiple DNS records in a single Cloudflare API call."
+    title = "Batch mutate DNS records",
+    description = "Creates, updates, or deletes multiple DNS records in one request. Cloudflare requires all three arrays; pass empty lists for operations you do not use."
 )
 @Plugin(
     examples = {
@@ -66,26 +66,26 @@ public class Batch extends AbstractCloudflareTask implements RunnableTask<Batch.
 
     @Schema(
         title = "Zone ID",
-        description = "The unique identifier of your Cloudflare zone."
+        description = "Cloudflare zone identifier"
     )
     @NotNull
     private Property<String> zoneId;
 
     @Schema(
         title = "Records to create",
-        description = "List of DNS records to create."
+        description = "Records to create; provide an empty list if not creating"
     )
     private Property<List<RecordInput>> posts;
 
     @Schema(
         title = "Records to update",
-        description = "List of DNS records to update (requires record ID)."
+        description = "Records to update with IDs; provide an empty list if not updating"
     )
     private Property<List<RecordPatch>> patches;
 
     @Schema(
         title = "Record IDs to delete",
-        description = "List of DNS record IDs to delete."
+        description = "DNS record IDs to delete; must be provided (can be empty)"
     )
     private Property<List<RecordDelete>> deletes;
 
@@ -160,7 +160,7 @@ public class Batch extends AbstractCloudflareTask implements RunnableTask<Batch.
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Success", description = "Whether the batch operation was successful.")
+        @Schema(title = "Success", description = "True when Cloudflare accepted the batch request")
         private final Boolean success;
     }
 }

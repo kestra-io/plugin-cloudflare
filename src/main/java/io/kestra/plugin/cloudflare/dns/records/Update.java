@@ -28,8 +28,8 @@ import java.util.Map;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Update DNS record",
-    description = "Updates an existing DNS record in Cloudflare."
+    title = "Update Cloudflare DNS record",
+    description = "Partially updates an existing DNS record in a zone; only provided fields are changed and Cloudflare returns an error if the record ID is invalid."
 )
 @Plugin(
     examples = {
@@ -53,23 +53,23 @@ import java.util.Map;
 )
 public class Update extends AbstractCloudflareTask implements RunnableTask<Update.Output> {
 
-    @Schema(description = "Cloudflare zone identifier.")
+    @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
     @NotNull
     private Property<String> zoneId;
 
-    @Schema(description = "ID of the DNS record to update.")
+    @Schema(title = "Record ID", description = "ID of the DNS record to update")
     @NotNull
     private Property<String> recordId;
 
-    @Schema(description = "New DNS record type (for example: A, AAAA, CNAME).")
+    @Schema(title = "Type", description = "DNS record type (for example: A, AAAA, CNAME)")
     private Property<String> recordType;
-    @Schema(description = "New DNS record name.")
+    @Schema(title = "Name", description = "DNS record name")
     private Property<String> name;
-    @Schema(description = "New DNS record content value.")
+    @Schema(title = "Content", description = "DNS record content value")
     private Property<String> content;
-    @Schema(description = "New TTL value in seconds.")
+    @Schema(title = "TTL", description = "TTL in seconds; omit to leave unchanged")
     private Property<Integer> ttl;
-    @Schema(description = "Whether Cloudflare proxy should be enabled.")
+    @Schema(title = "Proxied", description = "Whether Cloudflare proxying is enabled for the record")
     private Property<Boolean> proxied;
 
     @Override
@@ -116,7 +116,7 @@ public class Update extends AbstractCloudflareTask implements RunnableTask<Updat
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Record ID")
+        @Schema(title = "Record ID", description = "ID of the updated DNS record")
         private final String id;
     }
 }

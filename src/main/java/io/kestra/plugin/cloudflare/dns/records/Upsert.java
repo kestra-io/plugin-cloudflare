@@ -31,8 +31,8 @@ import static org.apache.hc.core5.http.Method.*;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Upsert DNS record",
-    description = "Creates the DNS record if it does not exist, otherwise updates it."
+    title = "Upsert Cloudflare DNS record",
+    description = "Creates a DNS record if it does not exist, otherwise patches the first match by name and type; defaults to automatic TTL (1) and proxying disabled."
 )
 @Plugin(
     examples = {
@@ -57,28 +57,28 @@ import static org.apache.hc.core5.http.Method.*;
 )
 public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upsert.Output> {
 
-    @Schema(description = "Cloudflare zone identifier.")
+    @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
     @NotNull
     private Property<String> zoneId;
 
-    @Schema(description = "DNS record type (for example: A, AAAA, CNAME).")
+    @Schema(title = "Record type", description = "DNS record type (for example: A, AAAA, CNAME)")
     @NotNull
     private Property<String> recordType;
 
-    @Schema(description = "DNS record name to create or update.")
+    @Schema(title = "Record name", description = "DNS record name to create or update")
     @NotNull
     private Property<String> name;
 
-    @Schema(description = "DNS record content value.")
+    @Schema(title = "Record content", description = "DNS record content value")
     @NotNull
     private Property<String> content;
 
     @Builder.Default
-    @Schema(description = "TTL in seconds. Use 1 for automatic.")
+    @Schema(title = "TTL", description = "TTL in seconds; 1 uses Cloudflare automatic (default)")
     private Property<Integer> ttl = Property.ofValue(1);
 
     @Builder.Default
-    @Schema(description = "Whether Cloudflare proxy should be enabled.")
+    @Schema(title = "Proxied", description = "Enable Cloudflare proxying; defaults to false")
     private Property<Boolean> proxied = Property.ofValue(false);
 
     @Override
@@ -175,19 +175,19 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Record ID")
+        @Schema(title = "Record ID", description = "ID of the created or updated record")
         private final String recordId;
-        @Schema(title = "Name")
+        @Schema(title = "Name", description = "Record name")
         private final String name;
-        @Schema(title = "Type")
+        @Schema(title = "Type", description = "Record type")
         private final String type;
-        @Schema(title = "Content")
+        @Schema(title = "Content", description = "Record content")
         private final String content;
-        @Schema(title = "TTL")
+        @Schema(title = "TTL", description = "Record TTL in seconds")
         private final Integer ttl;
-        @Schema(title = "Proxied")
+        @Schema(title = "Proxied", description = "Whether Cloudflare proxying is enabled")
         private final Boolean proxied;
-        @Schema(title = "Action")
+        @Schema(title = "Action", description = "Whether the record was created or updated")
         private final String action;
     }
 }

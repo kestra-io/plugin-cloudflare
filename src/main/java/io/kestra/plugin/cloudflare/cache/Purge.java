@@ -29,8 +29,8 @@ import java.util.Map;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Purge Cloudflare Cache",
-    description = "Purges Cloudflare cache for a zone. You can purge the entire cache, specific files, or by cache tags."
+    title = "Purge Cloudflare cached content",
+    description = "Purges cached assets for a Cloudflare zone. Requires `purgeAll` or at least one file or tag; default keeps the cache unchanged and the task fails if nothing is provided."
 )
 @Plugin(
     examples = {
@@ -71,27 +71,27 @@ public class Purge extends AbstractCloudflareTask implements RunnableTask<Purge.
 
     @Schema(
         title = "Zone ID",
-        description = "Unique identifier of the Cloudflare zone whose cache should be purged."
+        description = "Identifier of the Cloudflare zone to purge."
     )
     @NotNull
     private Property<String> zoneId;
 
     @Builder.Default
     @Schema(
-        title = "Purge all cache",
-        description = "If true, purges the entire cache for the zone."
+        title = "Purge entire cache",
+        description = "Set to true to purge the full zone cache; defaults to false and takes precedence over files or tags."
     )
     private Property<Boolean> purgeAll = Property.ofValue(false);
 
     @Schema(
         title = "Files",
-        description = "List of specific file URLs to purge from cache."
+        description = "List of absolute file URLs to purge when not purging everything."
     )
     private Property<List<String>> files;
 
     @Schema(
         title = "Cache tags",
-        description = "List of cache tags to purge."
+        description = "Cache tags to purge when tags are configured on the zone."
     )
     private Property<List<String>> tags;
 

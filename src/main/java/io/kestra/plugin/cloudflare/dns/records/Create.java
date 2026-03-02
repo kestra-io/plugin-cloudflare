@@ -28,8 +28,8 @@ import static org.apache.hc.core5.http.Method.POST;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Create DNS record",
-    description = "Creates a new DNS record in a Cloudflare zone. Useful for automating domain provisioning, blue/green deployments, or SaaS onboarding."
+    title = "Create Cloudflare DNS record",
+    description = "Creates a DNS record in a zone. Defaults to automatic TTL (1) and disables proxying; Cloudflare must return a record ID or the task fails."
 )
 @Plugin(
     examples = {
@@ -57,42 +57,42 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
 
     @Schema(
         title = "Zone ID",
-        description = "The unique identifier of your domain (zone) in Cloudflare. You can find this in the Cloudflare dashboard."
+        description = "Cloudflare zone identifier"
     )
     @NotNull
     private Property<String> zoneId;
 
     @Schema(
-        title = "Record recordType",
-        description = "Type of DNS record. Common values are A, AAAA, CNAME, TXT, MX."
+        title = "Record type",
+        description = "DNS record type such as A, AAAA, CNAME, TXT, MX"
     )
     @NotNull
     private Property<String> recordType;
 
     @Schema(
         title = "Record name",
-        description = "The hostname for the record. Example: app.example.com or just 'app'."
+        description = "Hostname for the record, e.g. app.example.com"
     )
     @NotNull
     private Property<String> name;
 
     @Schema(
         title = "Record content",
-        description = "The value of the record. For example, an IP address (for A record) or a domain (for CNAME)."
+        description = "Record value such as an IP address (A/AAAA) or target domain (CNAME)"
     )
     @NotNull
     private Property<String> content;
 
     @Schema(
         title = "TTL",
-        description = "Time to live in seconds. Use 1 for automatic. Default is automatic."
+        description = "TTL in seconds; 1 uses Cloudflare automatic (default)"
     )
     @Builder.Default
     private Property<Integer> ttl = Property.ofValue(1);
 
     @Schema(
         title = "Proxied",
-        description = "Whether Cloudflare should proxy traffic (orange cloud). Default is false."
+        description = "Enable Cloudflare proxying (orange cloud); defaults to false"
     )
     @Builder.Default
     private Property<Boolean> proxied = Property.ofValue(false);

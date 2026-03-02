@@ -29,8 +29,8 @@ import java.util.Map;
 @EqualsAndHashCode
 @ToString
 @Schema(
-    title = "Create IP Access Rule",
-    description = "Creates a Cloudflare IP Access rule at zone or account level."
+    title = "Create Cloudflare IP access rule",
+    description = "Creates an IP access rule scoped to either a zone or an account (provide exactly one). Supports block/challenge/whitelist modes and fails if Cloudflare does not return a rule ID."
 )
 @Plugin(
     examples = {
@@ -57,19 +57,19 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
 
     @Schema(
         title = "Zone ID",
-        description = "Zone ID where the rule should apply. Mutually exclusive with accountId."
+        description = "Zone ID to scope the rule; mutually exclusive with accountId"
     )
     private Property<String> zoneId;
 
     @Schema(
         title = "Account ID",
-        description = "Account ID where the rule should apply. Mutually exclusive with zoneId."
+        description = "Account ID to scope the rule; mutually exclusive with zoneId"
     )
     private Property<String> accountId;
 
     @Schema(
         title = "Mode",
-        description = "Action to apply.",
+        description = "Action to apply; case-insensitive values from Cloudflare API",
         allowableValues = {"block", "challenge", "whitelist", "js_challenge", "managed_challenge"}
     )
     @NotNull
@@ -77,7 +77,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
 
     @Schema(
         title = "Target Type",
-        description = "Type of entity to match.",
+        description = "Entity matched by the rule (IP/CIDR, ASN, or country)",
         allowableValues = {"ip", "ip_range", "asn", "country"}
     )
     @NotNull
@@ -85,14 +85,14 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
 
     @Schema(
         title = "Target Value",
-        description = "Value of the target (IP, CIDR, ASN, or country code)."
+        description = "Target value such as IP, CIDR block, ASN, or ISO country code"
     )
     @NotNull
     private Property<String> value;
 
     @Schema(
         title = "Notes",
-        description = "Optional description for this rule."
+        description = "Optional note displayed in Cloudflare dashboard"
     )
     private Property<String> notes;
 
@@ -187,16 +187,16 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
 
-        @Schema(title = "Rule ID", description = "Unique identifier of the rule.")
+        @Schema(title = "Rule ID", description = "Identifier returned by Cloudflare")
         private final String ruleId;
 
-        @Schema(title = "Mode", description = "Action applied.")
+        @Schema(title = "Mode", description = "Action applied")
         private final String mode;
 
-        @Schema(title = "Target", description = "Target type.")
+        @Schema(title = "Target", description = "Target type")
         private final String target;
 
-        @Schema(title = "Value", description = "Target value.")
+        @Schema(title = "Value", description = "Target value")
         private final String value;
     }
 }
