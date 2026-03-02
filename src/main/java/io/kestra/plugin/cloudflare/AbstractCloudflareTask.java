@@ -78,4 +78,20 @@ public abstract class AbstractCloudflareTask extends Task {
             throw new RuntimeException("Failed to call Cloudflare API", e);
         }
     }
+
+    @Schema(
+        title = "Record Type",
+        description = "Type of DNS record."
+    )
+    public enum DnsRecordType {
+        A,
+        AAAA,
+        CNAME,
+        TXT,
+        MX,
+        NS,
+        SRV,
+        PTR,
+        CAA
+    }
 }

@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
+import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +45,7 @@ class UpsertTest {
             .apiToken(Property.ofValue("test-token"))
             .baseUrl(Property.ofValue("http://localhost:28181"))
             .zoneId(Property.ofValue("test-zone"))
-            .recordType(Property.ofValue("A"))
+            .recordType(Property.ofValue(AbstractCloudflareTask.DnsRecordType.A))
             .name(Property.ofValue("app.example.com"))
             .content(Property.ofValue("1.2.3.4"))
             .build();

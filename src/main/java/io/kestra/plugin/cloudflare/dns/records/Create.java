@@ -63,11 +63,11 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
     private Property<String> zoneId;
 
     @Schema(
-        title = "Record type",
-        description = "DNS record type such as A, AAAA, CNAME, TXT, MX"
+        title = "Record Type",
+        description = "Type of DNS record. Common values are A, AAAA, CNAME, TXT, MX."
     )
     @NotNull
-    private Property<String> recordType;
+    private Property<DnsRecordType> recordType;
 
     @Schema(
         title = "Record name",
@@ -102,14 +102,14 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         Logger logger = runContext.logger();
 
         String rZoneId = runContext.render(zoneId).as(String.class).orElseThrow();
-        String rRecordType = runContext.render(this.recordType).as(String.class).orElseThrow();
+        DnsRecordType rRecordType = runContext.render(this.recordType).as(DnsRecordType.class).orElseThrow();
         String rName = runContext.render(name).as(String.class).orElseThrow();
         String rContent = runContext.render(content).as(String.class).orElseThrow();
         Integer rTtl = runContext.render(ttl).as(Integer.class).orElseThrow();
         Boolean rProxied = runContext.render(proxied).as(Boolean.class).orElseThrow();
         String rBaseUrl = runContext.render(this.getBaseUrl()).as(String.class).orElseThrow();
 
-        logger.info("Creating DNS record '{}' of recordType '{}' in zone '{}'", rName, rRecordType, rZoneId);
+        logger.info("Creating DNS record '{}' of type '{}' in zone '{}'", rName, rRecordType, rZoneId);
 
         var requestBuilder = HttpRequest.builder()
             .method(POST.name())
@@ -117,7 +117,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
             .body(HttpRequest.JsonRequestBody.builder()
                 .content(
                     java.util.Map.of(
-                        "type", rRecordType,
+                        "type", rRecordType.name(),
                         "name", rName,
                         "content", rContent,
                         "ttl", rTtl,

@@ -63,7 +63,7 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
 
     @Schema(title = "Record type", description = "DNS record type (for example: A, AAAA, CNAME)")
     @NotNull
-    private Property<String> recordType;
+    private Property<DnsRecordType> recordType;
 
     @Schema(title = "Record name", description = "DNS record name to create or update")
     @NotNull
@@ -86,7 +86,7 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
         Logger logger = runContext.logger();
 
         String rZoneId = runContext.render(zoneId).as(String.class).orElseThrow();
-        String rRecordType = runContext.render(recordType).as(String.class).orElseThrow();
+        DnsRecordType rRecordType = runContext.render(recordType).as(DnsRecordType.class).orElseThrow();
         String rName = runContext.render(name).as(String.class).orElseThrow();
         String rContent = runContext.render(content).as(String.class).orElseThrow();
         Integer rTtl = runContext.render(ttl).as(Integer.class).orElseThrow();
@@ -96,7 +96,7 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
         var listRequest = HttpRequest.builder()
             .method(GET.name())
             .uri(URI.create(rBaseUrl + "/zones/" + rZoneId +
-                "/dns_records?name=" + rName + "&type=" + rRecordType));
+                "/dns_records?name=" + rName + "&type=" + rRecordType.name()));
 
         HttpResponse<CloudflareEnvelope<List<RecordResponse>>> listResponse =
             this.request(runContext, listRequest,

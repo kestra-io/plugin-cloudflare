@@ -62,7 +62,7 @@ public class Update extends AbstractCloudflareTask implements RunnableTask<Updat
     private Property<String> recordId;
 
     @Schema(title = "Type", description = "DNS record type (for example: A, AAAA, CNAME)")
-    private Property<String> recordType;
+    private Property<DnsRecordType> recordType;
     @Schema(title = "Name", description = "DNS record name")
     private Property<String> name;
     @Schema(title = "Content", description = "DNS record content value")
@@ -82,7 +82,7 @@ public class Update extends AbstractCloudflareTask implements RunnableTask<Updat
 
         Map<String, Object> body = new HashMap<>();
 
-        runContext.render(recordType).as(String.class).ifPresent(rRecordType -> body.put("type", rRecordType));
+        runContext.render(recordType).as(DnsRecordType.class).ifPresent(rRecordType -> body.put("type", rRecordType.name()));
         runContext.render(name).as(String.class).ifPresent(rName -> body.put("name", rName));
         runContext.render(content).as(String.class).ifPresent(rContent -> body.put("content", rContent));
         runContext.render(ttl).as(Integer.class).ifPresent(rTtl -> body.put("ttl", rTtl));

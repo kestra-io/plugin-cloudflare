@@ -101,12 +101,23 @@ public class Batch extends AbstractCloudflareTask implements RunnableTask<Batch.
 
         logger.info("Executing batch DNS operation for zone '{}'", rZoneId);
 
-        assert rDeletes != null;
-        Map<String, Object> body = Map.of(
-            "posts", rPosts,
-            "patches", rPatches,
-            "deletes", rDeletes
-        );
+        Map<String, Object> body = new java.util.HashMap<>();
+
+        if (!rPosts.isEmpty()) {
+            body.put("posts", rPosts);
+        }
+
+        if (!rPatches.isEmpty()) {
+            body.put("patches", rPatches);
+        }
+
+        if (!rDeletes.isEmpty()) {
+            body.put("deletes", rDeletes);
+        }
+
+        if (body.isEmpty()) {
+            throw new IllegalArgumentException("At least one of posts, patches, or deletes must be provided.");
+        }
 
         var requestBuilder = HttpRequest.builder()
             .method("POST")
