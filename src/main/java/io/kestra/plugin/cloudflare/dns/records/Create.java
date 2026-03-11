@@ -1,6 +1,11 @@
 package io.kestra.plugin.cloudflare.dns.records;
 
+import java.net.URI;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,13 +17,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
 
 import static org.apache.hc.core5.http.Method.POST;
 
@@ -114,20 +117,22 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         var requestBuilder = HttpRequest.builder()
             .method(POST.name())
             .uri(URI.create(rBaseUrl + "/zones/" + rZoneId + "/dns_records"))
-            .body(HttpRequest.JsonRequestBody.builder()
-                .content(
-                    java.util.Map.of(
-                        "type", rRecordType.name(),
-                        "name", rName,
-                        "content", rContent,
-                        "ttl", rTtl,
-                        "proxied", rProxied
+            .body(
+                HttpRequest.JsonRequestBody.builder()
+                    .content(
+                        java.util.Map.of(
+                            "type", rRecordType.name(),
+                            "name", rName,
+                            "content", rContent,
+                            "ttl", rTtl,
+                            "proxied", rProxied
+                        )
                     )
-                )
-                .build()
+                    .build()
             );
 
-        HttpResponse<CloudflareEnvelope<RecordResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<RecordResponse>>() {});
+        HttpResponse<CloudflareEnvelope<RecordResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<RecordResponse>>() {
+        });
 
         CloudflareEnvelope<RecordResponse> body = response.getBody();
 
@@ -135,8 +140,10 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
             throw new IllegalStateException("Cloudflare API call failed: " + body);
         }
 
-        logger.info("DNS record created successfully with ID '{}'",
-            body.result().id());
+        logger.info(
+            "DNS record created successfully with ID '{}'",
+            body.result().id()
+        );
 
         return Output.builder()
             .recordId(body.result().id())
@@ -154,8 +161,8 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         String recordType,
         String content,
         Integer ttl,
-        Boolean proxied
-    ) {}
+        Boolean proxied) {
+    }
 
     @Builder
     @Getter

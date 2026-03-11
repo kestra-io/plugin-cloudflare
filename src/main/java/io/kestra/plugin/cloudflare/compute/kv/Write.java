@@ -1,6 +1,12 @@
 package io.kestra.plugin.cloudflare.compute.kv;
 
+import java.net.URI;
+import java.util.List;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,14 +18,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
-import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -84,13 +87,20 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
 
         var requestBuilder = HttpRequest.builder()
             .method("PUT")
-            .uri(URI.create(rBaseUrl + "/accounts/" + rAccountId +
-                "/storage/kv/namespaces/" + rNamespaceId + "/bulk"))
-            .body(HttpRequest.JsonRequestBody.builder()
-                .content(rPairs)
-                .build());
+            .uri(
+                URI.create(
+                    rBaseUrl + "/accounts/" + rAccountId +
+                        "/storage/kv/namespaces/" + rNamespaceId + "/bulk"
+                )
+            )
+            .body(
+                HttpRequest.JsonRequestBody.builder()
+                    .content(rPairs)
+                    .build()
+            );
 
-        HttpResponse<CloudflareEnvelope<BulkResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<BulkResponse>>() {});
+        HttpResponse<CloudflareEnvelope<BulkResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<BulkResponse>>() {
+        });
 
         var body = response.getBody();
 
@@ -104,9 +114,11 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
             .build();
     }
 
-    public record KVPair(String key, String value) {}
+    public record KVPair(String key, String value) {
+    }
 
-    public record BulkResponse(Integer successful_key_count, List<String> unsuccessful_keys) {}
+    public record BulkResponse(Integer successful_key_count, List<String> unsuccessful_keys) {
+    }
 
     @Builder
     @Getter

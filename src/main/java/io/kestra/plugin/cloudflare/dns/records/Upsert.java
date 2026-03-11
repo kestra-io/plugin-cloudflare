@@ -1,6 +1,14 @@
 package io.kestra.plugin.cloudflare.dns.records;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,16 +20,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.apache.hc.core5.http.Method.*;
 
@@ -95,15 +98,20 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
 
         var listRequest = HttpRequest.builder()
             .method(GET.name())
-            .uri(URI.create(rBaseUrl + "/zones/" + rZoneId +
-                "/dns_records?name=" + rName + "&type=" + rRecordType.name()));
+            .uri(
+                URI.create(
+                    rBaseUrl + "/zones/" + rZoneId +
+                        "/dns_records?name=" + rName + "&type=" + rRecordType.name()
+                )
+            );
 
-        HttpResponse<CloudflareEnvelope<List<RecordResponse>>> listResponse =
-            this.request(runContext, listRequest,
-                new TypeReference<CloudflareEnvelope<List<RecordResponse>>>() {});
+        HttpResponse<CloudflareEnvelope<List<RecordResponse>>> listResponse = this.request(
+            runContext, listRequest,
+            new TypeReference<CloudflareEnvelope<List<RecordResponse>>>() {
+            }
+        );
 
-        List<RecordResponse> existing =
-            listResponse.getBody() != null ? listResponse.getBody().result() : null;
+        List<RecordResponse> existing = listResponse.getBody() != null ? listResponse.getBody().result() : null;
 
         Map<String, Object> body = new HashMap<>();
         body.put("type", rRecordType.name());
@@ -120,11 +128,14 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
             var patchRequest = HttpRequest.builder()
                 .method(PATCH.name())
                 .uri(URI.create(rBaseUrl + "/zones/" + rZoneId + "/dns_records/" + recordId))
-                .body(HttpRequest.JsonRequestBody.builder()
-                    .content(body)
-                    .build());
+                .body(
+                    HttpRequest.JsonRequestBody.builder()
+                        .content(body)
+                        .build()
+                );
 
-            HttpResponse<CloudflareEnvelope<RecordResponse>> patchResponse = this.request(runContext, patchRequest, new TypeReference<CloudflareEnvelope<RecordResponse>>() {});
+            HttpResponse<CloudflareEnvelope<RecordResponse>> patchResponse = this.request(runContext, patchRequest, new TypeReference<CloudflareEnvelope<RecordResponse>>() {
+            });
 
             return buildOutput(patchResponse.getBody(), "updated");
         }
@@ -134,11 +145,14 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
         var createRequest = HttpRequest.builder()
             .method(POST.name())
             .uri(URI.create(rBaseUrl + "/zones/" + rZoneId + "/dns_records"))
-            .body(HttpRequest.JsonRequestBody.builder()
-                .content(body)
-                .build());
+            .body(
+                HttpRequest.JsonRequestBody.builder()
+                    .content(body)
+                    .build()
+            );
 
-        HttpResponse<CloudflareEnvelope<RecordResponse>> createResponse = this.request(runContext, createRequest, new TypeReference<CloudflareEnvelope<RecordResponse>>() {});
+        HttpResponse<CloudflareEnvelope<RecordResponse>> createResponse = this.request(runContext, createRequest, new TypeReference<CloudflareEnvelope<RecordResponse>>() {
+        });
 
         return buildOutput(createResponse.getBody(), "created");
     }
@@ -167,8 +181,8 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
         String type,
         String content,
         Integer ttl,
-        Boolean proxied
-    ) {}
+        Boolean proxied) {
+    }
 
     @Builder
     @Getter

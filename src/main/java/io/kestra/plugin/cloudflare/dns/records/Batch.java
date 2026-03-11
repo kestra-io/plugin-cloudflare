@@ -1,6 +1,13 @@
 package io.kestra.plugin.cloudflare.dns.records;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -14,15 +21,9 @@ import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import jakarta.validation.constraints.NotNull;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @SuperBuilder
 @Getter
@@ -122,12 +123,14 @@ public class Batch extends AbstractCloudflareTask implements RunnableTask<Batch.
         var requestBuilder = HttpRequest.builder()
             .method("POST")
             .uri(URI.create(rBaseUrl + "/zones/" + rZoneId + "/dns_records/batch"))
-            .body(HttpRequest.JsonRequestBody.builder()
-                .content(body)
-                .build()
+            .body(
+                HttpRequest.JsonRequestBody.builder()
+                    .content(body)
+                    .build()
             );
 
-        HttpResponse<CloudflareEnvelope<BatchResult>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<BatchResult>>() {});
+        HttpResponse<CloudflareEnvelope<BatchResult>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<BatchResult>>() {
+        });
 
         CloudflareEnvelope<BatchResult> result = response.getBody();
 
@@ -142,14 +145,13 @@ public class Batch extends AbstractCloudflareTask implements RunnableTask<Batch.
             .build();
     }
 
-
     public record RecordInput(
         String type,
         String name,
         String content,
         Integer ttl,
-        Boolean proxied
-    ) {}
+        Boolean proxied) {
+    }
 
     public record RecordPatch(
         String id,
@@ -157,16 +159,17 @@ public class Batch extends AbstractCloudflareTask implements RunnableTask<Batch.
         String name,
         String content,
         Integer ttl,
-        Boolean proxied
-    ) {}
+        Boolean proxied) {
+    }
 
-    public record RecordDelete(String id) {}
+    public record RecordDelete(String id) {
+    }
 
     public record BatchResult(
         Object posts,
         Object patches,
-        Object deletes
-    ) {}
+        Object deletes) {
+    }
 
     @Builder
     @Getter

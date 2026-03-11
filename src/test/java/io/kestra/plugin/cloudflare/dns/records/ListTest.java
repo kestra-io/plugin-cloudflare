@@ -1,11 +1,14 @@
 package io.kestra.plugin.cloudflare.dns.records;
 
+import org.junit.jupiter.api.Test;
+
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
+
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,24 +23,26 @@ class ListTest {
     @Test
     void shouldListDnsRecords() throws Exception {
 
-        stubFor(get(urlEqualTo("/zones/test-zone/dns_records"))
-            .willReturn(okJson("""
-                {
-                  "success": true,
-                  "errors": [],
-                  "messages": [],
-                  "result": [
-                    {
-                      "id": "abc123",
-                      "name": "app.example.com",
-                      "type": "A",
-                      "content": "1.2.3.4",
-                      "ttl": 1,
-                      "proxied": false
-                    }
-                  ]
-                }
-            """)));
+        stubFor(
+            get(urlEqualTo("/zones/test-zone/dns_records"))
+                .willReturn(okJson("""
+                        {
+                          "success": true,
+                          "errors": [],
+                          "messages": [],
+                          "result": [
+                            {
+                              "id": "abc123",
+                              "name": "app.example.com",
+                              "type": "A",
+                              "content": "1.2.3.4",
+                              "ttl": 1,
+                              "proxied": false
+                            }
+                          ]
+                        }
+                    """))
+        );
 
         List task = List.builder()
             .apiToken(Property.ofValue("test-token"))

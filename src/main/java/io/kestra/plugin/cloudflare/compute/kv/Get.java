@@ -1,6 +1,13 @@
 package io.kestra.plugin.cloudflare.compute.kv;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,15 +19,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
 
 @SuperBuilder
 @Getter
@@ -81,11 +84,14 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
         var requestBuilder = HttpRequest.builder()
             .method("POST")
             .uri(URI.create(rBaseUrl + "/accounts/" + rAccountId + "/storage/kv/namespaces/" + rNamespaceId + "/bulk/get"))
-            .body(HttpRequest.JsonRequestBody.builder()
-                .content(Map.of("keys", rKeys))
-                .build());
+            .body(
+                HttpRequest.JsonRequestBody.builder()
+                    .content(Map.of("keys", rKeys))
+                    .build()
+            );
 
-        HttpResponse<CloudflareEnvelope<BulkGetResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<BulkGetResponse>>() {});
+        HttpResponse<CloudflareEnvelope<BulkGetResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<BulkGetResponse>>() {
+        });
 
         var body = response.getBody();
 
@@ -98,7 +104,8 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
             .build();
     }
 
-    public record BulkGetResponse(Map<String, Object> values) {}
+    public record BulkGetResponse(Map<String, Object> values) {
+    }
 
     @Builder
     @Getter

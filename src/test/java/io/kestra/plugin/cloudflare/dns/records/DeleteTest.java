@@ -1,11 +1,14 @@
 package io.kestra.plugin.cloudflare.dns.records;
 
+import org.junit.jupiter.api.Test;
+
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
+
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,17 +23,19 @@ class DeleteTest {
     @Test
     void shouldDeleteDnsRecord() throws Exception {
 
-        stubFor(delete(urlEqualTo("/zones/test-zone/dns_records/abc123"))
-            .willReturn(okJson("""
-                {
-                  "success": true,
-                  "errors": [],
-                  "messages": [],
-                  "result": {
-                    "id": "abc123"
-                  }
-                }
-            """)));
+        stubFor(
+            delete(urlEqualTo("/zones/test-zone/dns_records/abc123"))
+                .willReturn(okJson("""
+                        {
+                          "success": true,
+                          "errors": [],
+                          "messages": [],
+                          "result": {
+                            "id": "abc123"
+                          }
+                        }
+                    """))
+        );
 
         Delete task = Delete.builder()
             .apiToken(Property.ofValue("test-token"))

@@ -1,6 +1,11 @@
 package io.kestra.plugin.cloudflare.waf.accessrules;
 
+import java.net.URI;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,14 +17,12 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
 
 @SuperBuilder
 @Getter
@@ -99,7 +102,8 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
             .method("DELETE")
             .uri(URI.create(rBaseUrl + scopePath + "/firewall/access_rules/rules/" + rRuleId));
 
-        HttpResponse<CloudflareEnvelope<DeleteResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<DeleteResponse>>() {});
+        HttpResponse<CloudflareEnvelope<DeleteResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<DeleteResponse>>() {
+        });
 
         CloudflareEnvelope<DeleteResponse> envelope = response.getBody();
 
@@ -116,7 +120,8 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
             .build();
     }
 
-    public record DeleteResponse(String id) {}
+    public record DeleteResponse(String id) {
+    }
 
     @Builder
     @Getter

@@ -1,6 +1,11 @@
 package io.kestra.plugin.cloudflare.zones;
 
+import java.net.URI;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -11,13 +16,10 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
-
 
 @SuperBuilder
 @Getter
@@ -58,7 +60,9 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
             .method("GET")
             .uri(URI.create(rBaseUrl + "/zones"));
 
-        HttpResponse<CloudflareEnvelope<java.util.List<ZoneResponse>>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<java.util.List<ZoneResponse>>>() {});
+        HttpResponse<CloudflareEnvelope<java.util.List<ZoneResponse>>> response = this
+            .request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<java.util.List<ZoneResponse>>>() {
+            });
 
         CloudflareEnvelope<java.util.List<ZoneResponse>> body = response.getBody();
 
@@ -74,8 +78,8 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
     public record ZoneResponse(
         String id,
         String name,
-        String status
-    ) {}
+        String status) {
+    }
 
     @Builder
     @Getter

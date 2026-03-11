@@ -1,12 +1,15 @@
 package io.kestra.plugin.cloudflare.dns.records;
 
+import org.junit.jupiter.api.*;
+
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
+
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.*;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,28 +24,31 @@ class CreateTest {
     @Test
     void shouldCreateDnsRecord() throws Exception {
 
-        stubFor(post(urlEqualTo("/zones/test-zone/dns_records"))
-            .withHeader("Authorization", equalTo("Bearer test-token"))
-            .withHeader("Content-Type", containing("application/json"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody("""
-                {
-                  "success": true,
-                  "errors": [],
-                  "messages": [],
-                  "result": {
-                    "id": "abc123",
-                    "name": "app.example.com",
-                    "recordType": "A",
-                    "content": "1.2.3.4",
-                    "ttl": 1,
-                    "proxied": false
-                  }
-                }
-                """)));
-
+        stubFor(
+            post(urlEqualTo("/zones/test-zone/dns_records"))
+                .withHeader("Authorization", equalTo("Bearer test-token"))
+                .withHeader("Content-Type", containing("application/json"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("""
+                            {
+                              "success": true,
+                              "errors": [],
+                              "messages": [],
+                              "result": {
+                                "id": "abc123",
+                                "name": "app.example.com",
+                                "recordType": "A",
+                                "content": "1.2.3.4",
+                                "ttl": 1,
+                                "proxied": false
+                              }
+                            }
+                            """)
+                )
+        );
 
         Create task = Create.builder()
             .apiToken(Property.ofValue("test-token"))
@@ -62,10 +68,11 @@ class CreateTest {
         assertEquals("app.example.com", output.getName());
         assertEquals("A", output.getType());
 
-        verify(postRequestedFor(urlEqualTo("/zones/test-zone/dns_records"))
-            .withRequestBody(matchingJsonPath("$.type", equalTo("A")))
-            .withRequestBody(matchingJsonPath("$.name", equalTo("app.example.com")))
-            .withRequestBody(matchingJsonPath("$.content", equalTo("1.2.3.4")))
+        verify(
+            postRequestedFor(urlEqualTo("/zones/test-zone/dns_records"))
+                .withRequestBody(matchingJsonPath("$.type", equalTo("A")))
+                .withRequestBody(matchingJsonPath("$.name", equalTo("app.example.com")))
+                .withRequestBody(matchingJsonPath("$.content", equalTo("1.2.3.4")))
         );
     }
 }

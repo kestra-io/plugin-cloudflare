@@ -1,6 +1,12 @@
 package io.kestra.plugin.cloudflare.zones;
 
+import java.net.URI;
+import java.util.List;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,14 +18,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
-import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -86,7 +89,6 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
         Logger logger = runContext.logger();
         String rBaseUrl = runContext.render(this.getBaseUrl()).as(String.class).orElseThrow();
 
-
         if (zoneId != null) {
             String rZoneId = runContext.render(zoneId).as(String.class).orElseThrow();
             logger.info("Fetching zone by ID '{}'", rZoneId);
@@ -95,7 +97,8 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
                 .method("GET")
                 .uri(URI.create(rBaseUrl + "/zones/" + rZoneId));
 
-            HttpResponse<CloudflareEnvelope<ZoneResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<ZoneResponse>>() {});
+            HttpResponse<CloudflareEnvelope<ZoneResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<ZoneResponse>>() {
+            });
 
             CloudflareEnvelope<ZoneResponse> body = response.getBody();
 
@@ -113,7 +116,8 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
             .method("GET")
             .uri(URI.create(rBaseUrl + "/zones?name=" + rHostname));
 
-        HttpResponse<CloudflareEnvelope<List<ZoneResponse>>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<List<ZoneResponse>>>() {});
+        HttpResponse<CloudflareEnvelope<List<ZoneResponse>>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<List<ZoneResponse>>>() {
+        });
 
         CloudflareEnvelope<List<ZoneResponse>> body = response.getBody();
 
@@ -135,8 +139,8 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
     public record ZoneResponse(
         String id,
         String name,
-        String status
-    ) {}
+        String status) {
+    }
 
     @Builder
     @Getter

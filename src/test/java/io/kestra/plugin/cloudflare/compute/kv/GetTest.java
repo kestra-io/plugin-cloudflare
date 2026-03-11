@@ -1,13 +1,16 @@
 package io.kestra.plugin.cloudflare.compute.kv;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import jakarta.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,22 +23,24 @@ class GetTest {
 
     @Test
     void shouldGet() throws Exception {
-        stubFor(post(urlEqualTo("/accounts/test-account/storage/kv/namespaces/ns_123/bulk/get"))
-            .withHeader("Authorization", equalTo("Bearer test-token"))
-            .withHeader("Content-Type", containing("application/json"))
-            .willReturn(okJson("""
-                {
-                  "success": true,
-                  "errors": [],
-                  "messages": [],
-                  "result": {
-                    "values": {
-                      "k1": "v1",
-                      "k2": "v2"
-                    }
-                  }
-                }
-            """)));
+        stubFor(
+            post(urlEqualTo("/accounts/test-account/storage/kv/namespaces/ns_123/bulk/get"))
+                .withHeader("Authorization", equalTo("Bearer test-token"))
+                .withHeader("Content-Type", containing("application/json"))
+                .willReturn(okJson("""
+                        {
+                          "success": true,
+                          "errors": [],
+                          "messages": [],
+                          "result": {
+                            "values": {
+                              "k1": "v1",
+                              "k2": "v2"
+                            }
+                          }
+                        }
+                    """))
+        );
 
         Get task = Get.builder()
             .apiToken(Property.ofValue("test-token"))
@@ -52,9 +57,10 @@ class GetTest {
         assertEquals("v1", output.getValues().get("k1"));
         assertEquals("v2", output.getValues().get("k2"));
 
-        verify(postRequestedFor(urlEqualTo("/accounts/test-account/storage/kv/namespaces/ns_123/bulk/get"))
-            .withRequestBody(matchingJsonPath("$.keys[0]", equalTo("k1")))
-            .withRequestBody(matchingJsonPath("$.keys[1]", equalTo("k2")))
+        verify(
+            postRequestedFor(urlEqualTo("/accounts/test-account/storage/kv/namespaces/ns_123/bulk/get"))
+                .withRequestBody(matchingJsonPath("$.keys[0]", equalTo("k1")))
+                .withRequestBody(matchingJsonPath("$.keys[1]", equalTo("k2")))
         );
     }
 }

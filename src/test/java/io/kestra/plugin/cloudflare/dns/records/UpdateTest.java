@@ -1,11 +1,14 @@
 package io.kestra.plugin.cloudflare.dns.records;
 
+import org.junit.jupiter.api.Test;
+
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
+
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,17 +23,19 @@ class UpdateTest {
     @Test
     void shouldUpdateDnsRecord() throws Exception {
 
-        stubFor(patch(urlEqualTo("/zones/test-zone/dns_records/abc123"))
-            .willReturn(okJson("""
-                {
-                  "success": true,
-                  "errors": [],
-                  "messages": [],
-                  "result": {
-                    "id": "abc123"
-                  }
-                }
-            """)));
+        stubFor(
+            patch(urlEqualTo("/zones/test-zone/dns_records/abc123"))
+                .willReturn(okJson("""
+                        {
+                          "success": true,
+                          "errors": [],
+                          "messages": [],
+                          "result": {
+                            "id": "abc123"
+                          }
+                        }
+                    """))
+        );
 
         Update task = Update.builder()
             .apiToken(Property.ofValue("test-token"))
@@ -45,7 +50,9 @@ class UpdateTest {
         assertNotNull(output);
         assertEquals("abc123", output.getId());
 
-        verify(patchRequestedFor(urlEqualTo("/zones/test-zone/dns_records/abc123"))
-            .withRequestBody(matchingJsonPath("$.content", equalTo("5.6.7.8"))));
+        verify(
+            patchRequestedFor(urlEqualTo("/zones/test-zone/dns_records/abc123"))
+                .withRequestBody(matchingJsonPath("$.content", equalTo("5.6.7.8")))
+        );
     }
 }

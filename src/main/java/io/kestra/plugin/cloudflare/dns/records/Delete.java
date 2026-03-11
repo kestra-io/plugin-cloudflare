@@ -1,6 +1,11 @@
 package io.kestra.plugin.cloudflare.dns.records;
 
+import java.net.URI;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,13 +17,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
 
 @SuperBuilder
 @Getter
@@ -72,7 +75,8 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
             .method("DELETE")
             .uri(URI.create(rBaseUrl + "/zones/" + rZoneId + "/dns_records/" + rRecordId));
 
-        HttpResponse<CloudflareEnvelope<DeleteResult>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<DeleteResult>>() {});
+        HttpResponse<CloudflareEnvelope<DeleteResult>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<DeleteResult>>() {
+        });
 
         CloudflareEnvelope<DeleteResult> body = response.getBody();
 
@@ -85,7 +89,8 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
             .build();
     }
 
-    public record DeleteResult(String id) {}
+    public record DeleteResult(String id) {
+    }
 
     @Builder
     @Getter

@@ -1,6 +1,12 @@
 package io.kestra.plugin.cloudflare.compute.namespaces;
 
+import java.net.URI;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,14 +18,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
-import java.util.Map;
 
 @SuperBuilder
 @Getter
@@ -78,11 +81,14 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         var requestBuilder = HttpRequest.builder()
             .method("POST")
             .uri(URI.create(rBaseUrl + "/accounts/" + rAccountId + "/storage/kv/namespaces"))
-            .body(HttpRequest.JsonRequestBody.builder()
-                .content(Map.of("title", rTitle))
-                .build());
+            .body(
+                HttpRequest.JsonRequestBody.builder()
+                    .content(Map.of("title", rTitle))
+                    .build()
+            );
 
-        HttpResponse<CloudflareEnvelope<NamespaceResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<NamespaceResponse>>() {});
+        HttpResponse<CloudflareEnvelope<NamespaceResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<NamespaceResponse>>() {
+        });
 
         var body = response.getBody();
 
@@ -98,7 +104,8 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
             .build();
     }
 
-    public record NamespaceResponse(String id, String title) {}
+    public record NamespaceResponse(String id, String title) {
+    }
 
     @Builder
     @Getter

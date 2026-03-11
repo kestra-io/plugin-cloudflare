@@ -1,6 +1,14 @@
 package io.kestra.plugin.cloudflare.waf.accessrules;
 
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,16 +20,11 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.cloudflare.AbstractCloudflareTask;
 import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.net.URI;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
 
 @SuperBuilder
 @Getter
@@ -70,7 +73,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
     @Schema(
         title = "Mode",
         description = "Action to apply; case-insensitive values from Cloudflare API",
-        allowableValues = {"block", "challenge", "whitelist", "js_challenge", "managed_challenge"}
+        allowableValues = { "block", "challenge", "whitelist", "js_challenge", "managed_challenge" }
     )
     @NotNull
     private Property<Mode> mode;
@@ -78,7 +81,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
     @Schema(
         title = "Target Type",
         description = "Entity matched by the rule (IP/CIDR, ASN, or country)",
-        allowableValues = {"ip", "ip_range", "asn", "country"}
+        allowableValues = { "ip", "ip_range", "asn", "country" }
     )
     @NotNull
     private Property<Target> target;
@@ -121,10 +124,12 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         Map<String, Object> payload = new LinkedHashMap<>();
 
         payload.put("mode", rMode.name().toLowerCase(Locale.ROOT));
-        payload.put("configuration", Map.of(
-            "target", rTarget.name().toLowerCase(Locale.ROOT),
-            "value", rValue
-        ));
+        payload.put(
+            "configuration", Map.of(
+                "target", rTarget.name().toLowerCase(Locale.ROOT),
+                "value", rValue
+            )
+        );
 
         if (rNotes != null && !rNotes.isBlank()) {
             payload.put("notes", rNotes);
@@ -133,11 +138,14 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         var requestBuilder = HttpRequest.builder()
             .method("POST")
             .uri(URI.create(rBaseUrl + scopePath + "/firewall/access_rules/rules"))
-            .body(HttpRequest.JsonRequestBody.builder()
-                .content(payload)
-                .build());
+            .body(
+                HttpRequest.JsonRequestBody.builder()
+                    .content(payload)
+                    .build()
+            );
 
-        HttpResponse<CloudflareEnvelope<AccessRuleResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<AccessRuleResponse>>() {});
+        HttpResponse<CloudflareEnvelope<AccessRuleResponse>> response = this.request(runContext, requestBuilder, new TypeReference<CloudflareEnvelope<AccessRuleResponse>>() {
+        });
 
         CloudflareEnvelope<AccessRuleResponse> envelope = response.getBody();
 
@@ -159,14 +167,13 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
     public record AccessRuleResponse(
         String id,
         String mode,
-        Configuration configuration
-    ) {}
+        Configuration configuration) {
+    }
 
     public record Configuration(
         String target,
-        String value
-    ) {}
-
+        String value) {
+    }
 
     public enum Mode {
         BLOCK,

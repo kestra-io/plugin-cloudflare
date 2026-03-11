@@ -1,12 +1,15 @@
 package io.kestra.plugin.cloudflare.waf;
 
+import org.junit.jupiter.api.Test;
+
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.plugin.cloudflare.waf.accessrules.Create;
+
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,20 +23,22 @@ class CreateTest {
 
     @Test
     void shouldCreateIpAccessRule() throws Exception {
-        stubFor(post(urlEqualTo("/zones/test-zone/firewall/access_rules/rules"))
-            .willReturn(okJson("""
-                {
-                  "success": true,
-                  "result": {
-                    "id": "rule123",
-                    "mode": "block",
-                    "configuration": {
-                      "target": "ip",
-                      "value": "1.2.3.4"
-                    }
-                  }
-                }
-            """)));
+        stubFor(
+            post(urlEqualTo("/zones/test-zone/firewall/access_rules/rules"))
+                .willReturn(okJson("""
+                        {
+                          "success": true,
+                          "result": {
+                            "id": "rule123",
+                            "mode": "block",
+                            "configuration": {
+                              "target": "ip",
+                              "value": "1.2.3.4"
+                            }
+                          }
+                        }
+                    """))
+        );
 
         Create task = Create.builder()
             .apiToken(Property.ofValue("test-token"))
@@ -51,8 +56,10 @@ class CreateTest {
         assertEquals("rule123", output.getRuleId());
         assertEquals("block", output.getMode());
 
-        verify(postRequestedFor(urlEqualTo("/zones/test-zone/firewall/access_rules/rules"))
-            .withRequestBody(matchingJsonPath("$.mode", equalTo("block")))
-            .withRequestBody(matchingJsonPath("$.configuration.value", equalTo("1.2.3.4"))));
+        verify(
+            postRequestedFor(urlEqualTo("/zones/test-zone/firewall/access_rules/rules"))
+                .withRequestBody(matchingJsonPath("$.mode", equalTo("block")))
+                .withRequestBody(matchingJsonPath("$.configuration.value", equalTo("1.2.3.4")))
+        );
     }
 }

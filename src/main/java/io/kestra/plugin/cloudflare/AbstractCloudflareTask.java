@@ -1,8 +1,11 @@
 package io.kestra.plugin.cloudflare;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -12,12 +15,11 @@ import io.kestra.core.http.client.configurations.HttpConfiguration;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.Task;
 import io.kestra.core.runners.RunContext;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
 
 @SuperBuilder
 @Getter
@@ -49,7 +51,8 @@ public abstract class AbstractCloudflareTask extends Task {
     )
     protected HttpConfiguration options;
 
-    protected <RES> HttpResponse<RES> request(RunContext runContext, HttpRequest.HttpRequestBuilder requestBuilder, TypeReference<RES> typeReference) throws HttpClientException, IllegalVariableEvaluationException {
+    protected <RES> HttpResponse<RES> request(RunContext runContext, HttpRequest.HttpRequestBuilder requestBuilder, TypeReference<RES> typeReference)
+        throws HttpClientException, IllegalVariableEvaluationException {
         String rApiToken = runContext.render(this.apiToken).as(String.class).orElseThrow();
         String rBaseUrl = runContext.render(this.baseUrl).as(String.class).orElseThrow();
 
@@ -59,15 +62,14 @@ public abstract class AbstractCloudflareTask extends Task {
             .addHeader("Accept", "application/json")
             .build();
 
-        HttpConfiguration httpConfiguration =
-            this.options != null ? this.options : HttpConfiguration.builder().build();
+        HttpConfiguration httpConfiguration = this.options != null ? this.options : HttpConfiguration.builder().build();
 
         try (HttpClient client = new HttpClient(runContext, httpConfiguration)) {
             HttpResponse<String> response = client.request(request, String.class);
 
             RES parsed = MAPPER.readValue(response.getBody(), typeReference);
 
-            return HttpResponse.<RES>builder()
+            return HttpResponse.<RES> builder()
                 .request(request)
                 .body(parsed)
                 .headers(response.getHeaders())
