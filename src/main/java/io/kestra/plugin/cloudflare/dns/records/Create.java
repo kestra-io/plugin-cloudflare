@@ -24,6 +24,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import static org.apache.hc.core5.http.Method.POST;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -63,6 +64,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "Cloudflare zone identifier"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> zoneId;
 
     @Schema(
@@ -70,6 +72,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "Type of DNS record. Common values are A, AAAA, CNAME, TXT, MX."
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<DnsRecordType> recordType;
 
     @Schema(
@@ -77,6 +80,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "Hostname for the record, e.g. app.example.com"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> name;
 
     @Schema(
@@ -84,6 +88,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "Record value such as an IP address (A/AAAA) or target domain (CNAME)"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> content;
 
     @Schema(
@@ -91,6 +96,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "TTL in seconds; 1 uses Cloudflare automatic (default)"
     )
     @Builder.Default
+    @PluginProperty(group = "advanced")
     private Property<Integer> ttl = Property.ofValue(1);
 
     @Schema(
@@ -98,6 +104,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "Enable Cloudflare proxying (orange cloud); defaults to false"
     )
     @Builder.Default
+    @PluginProperty(group = "advanced")
     private Property<Boolean> proxied = Property.ofValue(false);
 
     @Override

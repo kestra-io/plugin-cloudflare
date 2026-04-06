@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -57,6 +58,7 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
         description = "Cloudflare zone identifier"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> zoneId;
 
     @Override

@@ -27,6 +27,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import static org.apache.hc.core5.http.Method.*;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -62,26 +63,32 @@ public class Upsert extends AbstractCloudflareTask implements RunnableTask<Upser
 
     @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> zoneId;
 
     @Schema(title = "Record type", description = "DNS record type (for example: A, AAAA, CNAME)")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<DnsRecordType> recordType;
 
     @Schema(title = "Record name", description = "DNS record name to create or update")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> name;
 
     @Schema(title = "Record content", description = "DNS record content value")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> content;
 
     @Builder.Default
     @Schema(title = "TTL", description = "TTL in seconds; 1 uses Cloudflare automatic (default)")
+    @PluginProperty(group = "advanced")
     private Property<Integer> ttl = Property.ofValue(1);
 
     @Builder.Default
     @Schema(title = "Proxied", description = "Enable Cloudflare proxying; defaults to false")
+    @PluginProperty(group = "advanced")
     private Property<Boolean> proxied = Property.ofValue(false);
 
     @Override

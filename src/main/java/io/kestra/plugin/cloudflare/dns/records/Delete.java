@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -55,10 +56,12 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
 
     @NotNull
     @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
+    @PluginProperty(group = "main")
     private Property<String> zoneId;
 
     @NotNull
     @Schema(title = "Record ID", description = "DNS record ID to delete")
+    @PluginProperty(group = "main")
     private Property<String> recordId;
 
     @Override

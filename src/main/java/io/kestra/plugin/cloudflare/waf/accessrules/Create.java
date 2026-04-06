@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -62,12 +63,14 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         title = "Zone ID",
         description = "Zone ID to scope the rule; mutually exclusive with accountId"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> zoneId;
 
     @Schema(
         title = "Account ID",
         description = "Account ID to scope the rule; mutually exclusive with zoneId"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> accountId;
 
     @Schema(
@@ -76,6 +79,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         allowableValues = { "block", "challenge", "whitelist", "js_challenge", "managed_challenge" }
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<Mode> mode;
 
     @Schema(
@@ -84,6 +88,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         allowableValues = { "ip", "ip_range", "asn", "country" }
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<Target> target;
 
     @Schema(
@@ -91,12 +96,14 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "Target value such as IP, CIDR block, ASN, or ISO country code"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> value;
 
     @Schema(
         title = "Notes",
         description = "Optional note displayed in Cloudflare dashboard"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> notes;
 
     @Override

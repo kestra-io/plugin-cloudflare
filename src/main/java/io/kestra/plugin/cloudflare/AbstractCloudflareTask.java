@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -36,6 +37,7 @@ public abstract class AbstractCloudflareTask extends Task {
         description = "Your Cloudflare API token. Create one in the Cloudflare dashboard with DNS read/write permissions."
     )
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> apiToken;
 
     @Schema(
@@ -43,12 +45,14 @@ public abstract class AbstractCloudflareTask extends Task {
         description = "Base URL for Cloudflare API. Usually you don’t need to change this."
     )
     @Builder.Default
+    @PluginProperty(group = "connection")
     protected Property<String> baseUrl = Property.ofValue("https://api.cloudflare.com/client/v4");
 
     @Schema(
         title = "HTTP client options",
         description = "Optional advanced HTTP settings like timeouts or proxy."
     )
+    @PluginProperty(group = "advanced")
     protected HttpConfiguration options;
 
     protected <RES> HttpResponse<RES> request(RunContext runContext, HttpRequest.HttpRequestBuilder requestBuilder, TypeReference<RES> typeReference)

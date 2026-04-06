@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -61,10 +62,12 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
 
     @Schema(title = "Account ID", description = "Cloudflare account ID that owns the namespace")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> accountId;
 
     @Schema(title = "Namespace ID", description = "Target Workers KV namespace ID")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> namespaceId;
 
     @Schema(
@@ -72,6 +75,7 @@ public class Write extends AbstractCloudflareTask implements RunnableTask<Write.
         description = "Entries to write; all are sent in one bulk request and overwrite existing values with the same key"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<List<KVPair>> keyValues;
 
     @Override

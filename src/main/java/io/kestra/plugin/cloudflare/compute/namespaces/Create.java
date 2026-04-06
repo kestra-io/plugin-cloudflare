@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -59,6 +60,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "Cloudflare account identifier"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> accountId;
 
     @Schema(
@@ -66,6 +68,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         description = "Display title for the namespace shown in Cloudflare"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> title;
 
     @Override

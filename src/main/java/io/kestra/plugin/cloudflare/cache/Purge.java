@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -76,6 +77,7 @@ public class Purge extends AbstractCloudflareTask implements RunnableTask<Purge.
         description = "Identifier of the Cloudflare zone to purge."
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> zoneId;
 
     @Builder.Default
@@ -83,18 +85,21 @@ public class Purge extends AbstractCloudflareTask implements RunnableTask<Purge.
         title = "Purge entire cache",
         description = "Set to true to purge the full zone cache; defaults to false and takes precedence over files or tags."
     )
+    @PluginProperty(group = "advanced")
     private Property<Boolean> purgeAll = Property.ofValue(false);
 
     @Schema(
         title = "Files",
         description = "List of absolute file URLs to purge when not purging everything."
     )
+    @PluginProperty(group = "advanced")
     private Property<List<String>> files;
 
     @Schema(
         title = "Cache tags",
         description = "Cache tags to purge when tags are configured on the zone."
     )
+    @PluginProperty(group = "advanced")
     private Property<List<String>> tags;
 
     @Override
