@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -70,24 +71,28 @@ public class Batch extends AbstractCloudflareTask implements RunnableTask<Batch.
         description = "Cloudflare zone identifier"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> zoneId;
 
     @Schema(
         title = "Records to create",
         description = "Records to create; provide an empty list if not creating"
     )
+    @PluginProperty(group = "advanced")
     private Property<List<RecordInput>> posts;
 
     @Schema(
         title = "Records to update",
         description = "Records to update with IDs; provide an empty list if not updating"
     )
+    @PluginProperty(group = "advanced")
     private Property<List<RecordPatch>> patches;
 
     @Schema(
         title = "Record IDs to delete",
         description = "DNS record IDs to delete; must be provided (can be empty)"
     )
+    @PluginProperty(group = "advanced")
     private Property<List<RecordDelete>> deletes;
 
     @Override

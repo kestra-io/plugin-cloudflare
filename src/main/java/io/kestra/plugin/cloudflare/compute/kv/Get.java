@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -60,14 +61,17 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
 
     @Schema(title = "Account ID", description = "Cloudflare account identifier")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> accountId;
 
     @Schema(title = "Namespace ID", description = "Workers KV namespace identifier")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> namespaceId;
 
     @Schema(title = "Keys", description = "Keys to retrieve from the namespace in bulk")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<List<String>> keys;
 
     @Override

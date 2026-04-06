@@ -23,6 +23,7 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -58,12 +59,14 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
         title = "Zone ID",
         description = "Zone ID where the rule exists; mutually exclusive with accountId"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> zoneId;
 
     @Schema(
         title = "Account ID",
         description = "Account ID where the rule exists; mutually exclusive with zoneId"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> accountId;
 
     @Schema(
@@ -71,6 +74,7 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<Delet
         description = "Identifier of the IP access rule to delete"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> ruleId;
 
     @AssertTrue(message = "Either zoneId or accountId must be provided (but not both).")

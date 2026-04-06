@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -71,12 +72,14 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
         title = "Zone ID",
         description = "Cloudflare zone identifier; takes priority over hostname when both are provided"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> zoneId;
 
     @Schema(
         title = "Zone hostname",
         description = "Domain name of the zone used when zoneId is not provided"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> hostname;
 
     @AssertTrue(message = "Either 'zoneId' or 'hostname' must be provided.")

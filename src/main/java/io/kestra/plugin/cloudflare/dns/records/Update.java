@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -58,21 +59,28 @@ public class Update extends AbstractCloudflareTask implements RunnableTask<Updat
 
     @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> zoneId;
 
     @Schema(title = "Record ID", description = "ID of the DNS record to update")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> recordId;
 
     @Schema(title = "Type", description = "DNS record type (for example: A, AAAA, CNAME)")
+    @PluginProperty(group = "advanced")
     private Property<DnsRecordType> recordType;
     @Schema(title = "Name", description = "DNS record name")
+    @PluginProperty(group = "advanced")
     private Property<String> name;
     @Schema(title = "Content", description = "DNS record content value")
+    @PluginProperty(group = "advanced")
     private Property<String> content;
     @Schema(title = "TTL", description = "TTL in seconds; omit to leave unchanged")
+    @PluginProperty(group = "advanced")
     private Property<Integer> ttl;
     @Schema(title = "Proxied", description = "Whether Cloudflare proxying is enabled for the record")
+    @PluginProperty(group = "advanced")
     private Property<Boolean> proxied;
 
     @Override

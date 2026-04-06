@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @Getter
@@ -55,10 +56,12 @@ public class Get extends AbstractCloudflareTask implements RunnableTask<Get.Outp
 
     @Schema(title = "Zone ID", description = "Cloudflare zone identifier")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> zoneId;
 
     @Schema(title = "Record ID", description = "ID of the DNS record to fetch")
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> recordId;
 
     @Override
