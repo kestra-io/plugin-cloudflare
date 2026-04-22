@@ -37,7 +37,7 @@ public abstract class AbstractCloudflareTask extends Task {
         description = "Your Cloudflare API token. Create one in the Cloudflare dashboard with DNS read/write permissions."
     )
     @NotNull
-    @PluginProperty(group = "main")
+    @PluginProperty(secret = true, group = "main")
     protected Property<String> apiToken;
 
     @Schema(
