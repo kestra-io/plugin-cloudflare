@@ -1,0 +1,9 @@
+# Requires a live Cloudflare account and API token; exercised only via the disabled WorkersRunnerTest.
+id: workers_scripts_list
+namespace: company.team
+
+tasks:
+  - id: list
+    type: io.kestra.plugin.cloudflare.workers.scripts.List
+    apiToken: "{{ secret('CLOUDFLARE_API_TOKEN') }}"
+    accountId: "{{ secret('CLOUDFLARE_ACCOUNT_ID') }}"

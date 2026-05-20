@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.workers
+name: "workers"
+title: "Cloudflare Workers"
+description: "Tasks that interact with Cloudflare Workers: run inline code via Dynamic Workers and manage Worker scripts as resources."
+body: "Includes the Dynamic Workers subpackage (`workers.dynamic.Run`) for running inline code on the edge via the Worker Loader binding, and the Worker Scripts subpackage (`workers.scripts.*`) for managing scripts on an account."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"
