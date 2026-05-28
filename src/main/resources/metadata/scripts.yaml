@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.workers.scripts
+name: "scripts"
+title: "Cloudflare Worker scripts"
+description: "Tasks that manage Cloudflare Worker scripts as resources via the Workers Scripts REST API."
+body: "Deploy, list, get, and delete Cloudflare Worker scripts on an account. Companion to `io.kestra.plugin.cloudflare.workers.dynamic.Run`, which invokes inline code through a gateway Worker."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"
