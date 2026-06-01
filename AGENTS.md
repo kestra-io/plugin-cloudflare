@@ -29,6 +29,14 @@ Infrastructure dependencies (Docker Compose services):
 - `io.kestra.plugin.cloudflare.compute.kv.Get`
 - `io.kestra.plugin.cloudflare.compute.kv.Write`
 - `io.kestra.plugin.cloudflare.compute.namespaces.Create`
+- `io.kestra.plugin.cloudflare.d1.CreateDatabase`
+- `io.kestra.plugin.cloudflare.d1.ListDatabases`
+- `io.kestra.plugin.cloudflare.d1.GetDatabase`
+- `io.kestra.plugin.cloudflare.d1.DeleteDatabase`
+- `io.kestra.plugin.cloudflare.d1.Query`
+- `io.kestra.plugin.cloudflare.d1.RawQuery`
+- `io.kestra.plugin.cloudflare.d1.Export`
+- `io.kestra.plugin.cloudflare.d1.Import`
 - `io.kestra.plugin.cloudflare.dns.records.Batch`
 - `io.kestra.plugin.cloudflare.dns.records.Create`
 - `io.kestra.plugin.cloudflare.dns.records.Delete`
