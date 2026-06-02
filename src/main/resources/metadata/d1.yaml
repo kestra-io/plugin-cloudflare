@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.d1
+name: "d1"
+title: "Cloudflare D1"
+description: "Tasks that manage Cloudflare D1 serverless SQLite databases and run SQL against them."
+body: "Create, retrieve, list, and delete D1 databases. Execute parameterized SQL queries with configurable fetch modes (FETCH_ONE, FETCH, STORE, NONE), run raw column-oriented queries, export full SQL dumps to Kestra internal storage, and import SQL files back into a database."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"

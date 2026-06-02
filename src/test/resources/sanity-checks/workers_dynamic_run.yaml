@@ -1,0 +1,19 @@
+# Requires a live Cloudflare worker gateway; exercised only via the disabled WorkersRunnerTest.
+id: workers_dynamic_run
+namespace: company.team
+
+tasks:
+  - id: run
+    type: io.kestra.plugin.cloudflare.workers.dynamic.Run
+    gatewayUrl: "https://loader.example.workers.dev"
+    headers:
+      Authorization: "Bearer {{ secret('GATEWAY_TOKEN') }}"
+    payload:
+      user: "alice"
+    script: |
+      export default {
+        async fetch(request) {
+          const body = await request.json();
+          return Response.json({ hello: body.user });
+        }
+      };

@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.workers.dynamic
+name: "dynamic"
+title: "Cloudflare Dynamic Workers"
+description: "Tasks that run inline code on a gateway Cloudflare Worker using the Dynamic Workers (Worker Loader) binding."
+body: "POST inline JavaScript or TypeScript source to a user-deployed gateway Worker that calls `env.LOADER.load(...)` to execute the code on the edge. The gateway URL is the auth boundary; the task does not require an API token or account ID."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"
