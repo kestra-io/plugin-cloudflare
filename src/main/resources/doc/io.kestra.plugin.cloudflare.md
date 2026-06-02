@@ -26,13 +26,13 @@ Set `apiToken` (required) to a Cloudflare API token with the appropriate permiss
 
 `dns.records.List` lists records in a zone — set `zoneId` (required). The output includes a `records` list.
 
-`dns.records.Update` updates a record — set `zoneId` and `recordId` (both required); all other fields (`recordType`, `name`, `content`, `ttl`, `proxied`) are optional and only sent if provided.
+`dns.records.Update` updates a record — set `zoneId` and `recordId` (both required); all other fields (`recordType`, `name`, `content`, `ttl`, `proxied`) are optional and only sent if provided. The output includes `id`.
 
 `dns.records.Delete` deletes a record — set `zoneId` and `recordId` (both required). The output includes `deletedId`.
 
 `dns.records.Upsert` creates or updates a record by name and type — set `zoneId`, `recordType`, `name`, and `content` (all required). The output includes `action` (`created` or `updated`).
 
-`dns.records.Batch` performs multiple DNS operations atomically — set `zoneId` (required) and at least one of `posts` (records to create), `patches` (records to update), or `deletes` (record IDs to remove).
+`dns.records.Batch` performs multiple DNS operations atomically — set `zoneId` (required) and at least one of `posts` (records to create), `patches` (records to update), or `deletes` (record IDs to remove). The output includes `success`.
 
 ### Workers KV
 
@@ -41,6 +41,24 @@ Set `apiToken` (required) to a Cloudflare API token with the appropriate permiss
 `compute.kv.Write` writes key-value pairs — set `accountId`, `namespaceId`, and `keyValues` (required, list of `{key, value}` objects). The output includes `successfulKeyCount` and `unsuccessfulKeys`.
 
 `compute.namespaces.Create` creates a KV namespace — set `accountId` and `title` (both required). The output includes `namespaceId` and `title`.
+
+### D1
+
+`d1.CreateDatabase` creates a D1 database — set `accountId` and `name` (both required). The output includes `databaseId`, `name`, and `version`.
+
+`d1.ListDatabases` lists all D1 databases in an account — set `accountId` (required). Optionally set `nameFilter` (prefix filter) and `perPage` (default 100, max 100); results are auto-paginated. The output includes a `databases` list and `total` count.
+
+`d1.GetDatabase` fetches a single D1 database — set `accountId` and `databaseId` (both required). The output includes `databaseId`, `name`, `version`, `numTables`, and `fileSize`.
+
+`d1.DeleteDatabase` deletes a D1 database — set `accountId` and `databaseId` (both required). The output includes `databaseId`.
+
+`d1.Query` runs a parameterized SQL statement — set `accountId`, `databaseId`, and `sql` (all required). Optionally set `params` (list of bind values) and `fetchType` (default `STORE`; values: `FETCH_ONE`, `FETCH`, `STORE`, `NONE`). Output varies by `fetchType`: `FETCH_ONE` returns `row` and `meta`; `FETCH` returns `rows` and `meta`; `STORE` writes results to Kestra storage and returns `uri`; `NONE` returns only `meta`. All modes include `size` and a `meta` object with execution statistics.
+
+`d1.RawQuery` runs a SQL statement and returns column-oriented results — set `accountId`, `databaseId`, and `sql` (all required). Optionally set `params`. The output includes `columns` (list of column names), `rows` (list of value arrays), `size`, and `meta`.
+
+`d1.Export` exports a database to a SQL dump — set `accountId` and `databaseId` (both required). Optionally set `maxDuration` (ISO-8601 duration, default 5 minutes). The operation polls asynchronously until the export completes. The output includes `uri` (Kestra storage URI to the SQL file) and `filename`.
+
+`d1.Import` imports SQL into a database — set `accountId`, `databaseId`, and exactly one of `from` (Kestra storage URI) or `sql` (inline SQL string). Optionally set `maxDuration` (default 5 minutes). The operation uses a 3-step protocol (init, upload, ingest) and polls until complete. The output includes `filename`, `etag`, `finalBookmark`, `numQueries`, and `meta`.
 
 ### WAF
 
