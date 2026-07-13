@@ -1,8 +1,6 @@
 package io.kestra.plugin.cloudflare.workers.scripts;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedInputStream;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -247,14 +245,8 @@ class ListTest {
         assertNotNull(output.getUri());
         assertNull(output.getRows());
 
-        try (
-            var reader = new BufferedReader(
-                new InputStreamReader(
-                    storageInterface.get(TenantService.MAIN_TENANT, null, output.getUri()), StandardCharsets.UTF_8
-                )
-            )
-        ) {
-            var rows = FileSerde.readAll(reader).collectList().block();
+        try (var inputStream = new BufferedInputStream(storageInterface.get(TenantService.MAIN_TENANT, null, output.getUri()), FileSerde.BUFFER_SIZE)) {
+            var rows = FileSerde.readAll(inputStream).collectList().block();
             assertNotNull(rows);
             assertEquals(2, rows.size());
         }
