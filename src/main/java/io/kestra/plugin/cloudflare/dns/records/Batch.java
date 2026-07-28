@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @Schema(
     title = "Batch mutate DNS records",
-    description = "Creates, updates, or deletes multiple DNS records in one request. Cloudflare requires all three arrays; pass empty lists for operations you do not use."
+    description = "Creates, updates, or deletes multiple DNS records in one request. Provide at least one of posts, patches, or deletes; arrays you leave empty are omitted from the request."
 )
 @Plugin(
     examples = {
@@ -90,7 +90,7 @@ public class Batch extends AbstractCloudflareTask implements RunnableTask<Batch.
 
     @Schema(
         title = "Record IDs to delete",
-        description = "DNS record IDs to delete; must be provided (can be empty)"
+        description = "Record IDs to delete; provide an empty list if not deleting"
     )
     @PluginProperty(group = "advanced")
     private Property<List<RecordDelete>> deletes;

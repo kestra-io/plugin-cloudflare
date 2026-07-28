@@ -1,6 +1,6 @@
 # How to use the Cloudflare plugin
 
-Manage Cloudflare DNS records, cache, WAF rules, and Workers KV from Kestra flows.
+Manage Cloudflare zones, DNS records, cache, WAF rules, D1 databases, Workers, and Workers KV from Kestra flows.
 
 ## Authentication
 
@@ -59,6 +59,18 @@ Set `apiToken` (required) to a Cloudflare API token with the appropriate permiss
 `d1.Export` exports a database to a SQL dump — set `accountId` and `databaseId` (both required). Optionally set `maxDuration` (ISO-8601 duration, default 5 minutes). The operation polls asynchronously until the export completes. The output includes `uri` (Kestra storage URI to the SQL file) and `filename`.
 
 `d1.Import` imports SQL into a database — set `accountId`, `databaseId`, and exactly one of `from` (Kestra storage URI) or `sql` (inline SQL string). Optionally set `maxDuration` (default 5 minutes). The operation uses a 3-step protocol (init, upload, ingest) and polls until complete. The output includes `filename`, `etag`, `finalBookmark`, `numQueries`, and `meta`.
+
+### Workers
+
+`workers.dynamic.Run` runs inline JavaScript or TypeScript on a gateway Worker (Dynamic Workers) — set `gatewayUrl` and `script` (both required). Optionally set `payload`, `headers` (used for gateway authentication — this task takes no `apiToken`), and `contentType`. The output includes `statusCode`, `headers`, and `body`.
+
+`workers.scripts.Deploy` uploads or replaces a Worker script — set `accountId`, `scriptName`, and `script` (all required). `PUT` is idempotent, so redeploying with the same `scriptName` updates the existing script. The output includes `id` and `etag`.
+
+`workers.scripts.Get` fetches a Worker script's source — set `accountId` and `scriptName` (both required). Both module-format (multipart) and legacy service-worker responses are handled; the output includes `script`, `format`, `entrypoint`, `handlers`, and `etag`.
+
+`workers.scripts.List` lists all Worker scripts on an account — set `accountId` (required); Cloudflare cursor pagination is followed internally.
+
+`workers.scripts.Delete` deletes a Worker script — set `accountId` and `scriptName` (both required). Set `force: true` to delete a script still referenced by routes.
 
 ### WAF
 

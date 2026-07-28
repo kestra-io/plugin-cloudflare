@@ -34,7 +34,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @Schema(
     title = "Create Cloudflare IP access rule",
-    description = "Creates an IP access rule scoped to either a zone or an account (provide exactly one). Supports block/challenge/whitelist modes and fails if Cloudflare does not return a rule ID."
+    description = "Creates an IP access rule scoped to either a zone or an account (provide exactly one). Supports block, challenge, whitelist, js_challenge, and managed_challenge modes and fails if Cloudflare does not return a rule ID."
 )
 @Plugin(
     examples = {
@@ -172,14 +172,14 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
     }
 
     public record AccessRuleResponse(
-        String id,
-        String mode,
-        Configuration configuration) {
+        @Schema(title = "Rule ID") String id,
+        @Schema(title = "Mode", description = "Action applied by the rule") String mode,
+        @Schema(title = "Configuration", description = "Rule target and value") Configuration configuration) {
     }
 
     public record Configuration(
-        String target,
-        String value) {
+        @Schema(title = "Target", description = "Target type (e.g. ip, ip_range, asn, country)") String target,
+        @Schema(title = "Value", description = "Target value") String value) {
     }
 
     public enum Mode {

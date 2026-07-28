@@ -33,7 +33,7 @@ import static org.apache.hc.core5.http.Method.POST;
 @ToString
 @Schema(
     title = "Create Cloudflare DNS record",
-    description = "Creates a DNS record in a zone. Defaults to automatic TTL (1) and disables proxying; Cloudflare must return a record ID or the task fails."
+    description = "Creates a DNS record in a zone. Defaults to automatic TTL (1) and disables proxying; the task fails if Cloudflare rejects the request."
 )
 @Plugin(
     examples = {
@@ -180,7 +180,7 @@ public class Create extends AbstractCloudflareTask implements RunnableTask<Creat
         @Schema(title = "Name", description = "DNS record name.")
         private final String name;
 
-        @Schema(title = "Type", description = "DNS record recordType.")
+        @Schema(title = "Type", description = "DNS record type.")
         private final String type;
 
         @Schema(title = "Content", description = "DNS record value.")

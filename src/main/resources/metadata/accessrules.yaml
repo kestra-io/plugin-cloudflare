@@ -2,7 +2,7 @@ group: io.kestra.plugin.cloudflare.waf.accessrules
 name: "accessrules"
 title: "Cloudflare IP Access Rules"
 description: "Tasks that manage Cloudflare IP Access Rules."
-body: "Create, retrieve, update, delete, and list IP Access Rules at the account or zone level. Control traffic by blocking, challenging, or allowing IP addresses, IP ranges, ASNs, and countries to automate security and threat response workflows."
+body: "Create, delete, and list IP Access Rules at the account or zone level. Control traffic by blocking, challenging, or allowing IP addresses, IP ranges, ASNs, and countries to automate security and threat response workflows."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"

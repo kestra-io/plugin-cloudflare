@@ -393,7 +393,7 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
         @Schema(title = "Filename", description = "Filename assigned by Cloudflare for this import (derived from database ID and etag)")
         private final String filename;
 
-        @Schema(title = "Etag", description = "MD5 hex digest of the uploaded SQL, as sent to Cloudflare")
+        @Schema(title = "ETag", description = "MD5 hex digest of the uploaded SQL, as sent to Cloudflare")
         private final String etag;
 
         @Schema(title = "Final bookmark", description = "D1 replication bookmark after the import completed")

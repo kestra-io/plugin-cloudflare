@@ -2,7 +2,7 @@ group: io.kestra.plugin.cloudflare.compute.namespaces
 name: "namespaces"
 title: "Cloudflare Workers KV Namespaces"
 description: "Tasks that manage Cloudflare Workers KV namespaces."
-body: "Create, retrieve, list, and delete Workers KV namespaces to organize and isolate key-value storage within a Cloudflare account. Enables structured edge data management for scalable applications."
+body: "Create Workers KV namespaces to organize and isolate key-value storage within a Cloudflare account. Enables structured edge data management for scalable applications."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"
