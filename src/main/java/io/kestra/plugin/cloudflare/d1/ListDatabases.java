@@ -158,10 +158,10 @@ public class ListDatabases extends AbstractCloudflareTask implements RunnableTas
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DatabaseResponse(
-        String uuid,
-        String name,
-        String version,
-        @JsonProperty("num_tables") Integer numTables) {
+        @Schema(title = "Database UUID") String uuid,
+        @Schema(title = "Database name") String name,
+        @Schema(title = "Database version") String version,
+        @Schema(title = "Number of tables") @JsonProperty("num_tables") Integer numTables) {
     }
 
     @Builder

@@ -37,7 +37,7 @@ public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask 
 
     @Schema(
         title = "Cloudflare API token",
-        description = "Your Cloudflare API token. Create one in the Cloudflare dashboard with DNS read/write permissions."
+        description = "Your Cloudflare API token. Create one in the Cloudflare dashboard with the permissions required by the resources you manage (e.g. DNS, Workers, D1, cache, WAF, zones)."
     )
     @NotNull
     @PluginProperty(secret = true, group = "connection")
@@ -45,7 +45,7 @@ public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask 
 
     @Schema(
         title = "Cloudflare API base URL",
-        description = "Base URL for Cloudflare API. Usually you don’t need to change this."
+        description = "Base URL for Cloudflare API. Usually you don't need to change this."
     )
     @Builder.Default
     @PluginProperty(group = "connection")

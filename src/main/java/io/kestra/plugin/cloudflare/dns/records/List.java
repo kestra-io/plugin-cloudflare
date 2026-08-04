@@ -87,12 +87,12 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
     }
 
     public record RecordResponse(
-        String id,
-        String name,
-        String type,
-        String content,
-        Integer ttl,
-        Boolean proxied) {
+        @Schema(title = "Record ID") String id,
+        @Schema(title = "Record name") String name,
+        @Schema(title = "Record type") String type,
+        @Schema(title = "Record content") String content,
+        @Schema(title = "TTL") Integer ttl,
+        @Schema(title = "Proxied") Boolean proxied) {
     }
 
     @Builder

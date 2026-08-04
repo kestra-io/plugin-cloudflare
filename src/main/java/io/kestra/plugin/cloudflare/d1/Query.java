@@ -45,7 +45,7 @@ import lombok.experimental.SuperBuilder;
     description = """
         Executes a parameterized SQL statement against a D1 database. Supports four fetch modes:
         FETCH_ONE returns the first row as a map, FETCH returns all rows as a list of maps,
-        STORE writes all rows to Kestra internal storage as newline-delimited JSON, and
+        STORE writes all rows to Kestra internal storage as a newline-delimited ION file, and
         NONE returns only the query metadata (rows written, duration).
         """
 )
@@ -252,7 +252,7 @@ public class Query extends AbstractCloudflareTask implements RunnableTask<Query.
         @Schema(title = "All rows", description = "All result rows as a list of maps (FETCH mode only)")
         private final List<Map<String, Object>> rows;
 
-        @Schema(title = "Storage URI", description = "Internal storage URI of the newline-delimited Ion file (STORE mode only)")
+        @Schema(title = "Storage URI", description = "Internal storage URI of the newline-delimited ION file (STORE mode only)")
         private final URI uri;
 
         @Schema(title = "Row count", description = "Number of rows in the result set")

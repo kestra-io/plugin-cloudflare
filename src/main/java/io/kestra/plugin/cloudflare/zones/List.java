@@ -76,9 +76,9 @@ public class List extends AbstractCloudflareTask implements RunnableTask<List.Ou
     }
 
     public record ZoneResponse(
-        String id,
-        String name,
-        String status) {
+        @Schema(title = "Zone ID") String id,
+        @Schema(title = "Zone name") String name,
+        @Schema(title = "Zone status") String status) {
     }
 
     @Builder
