@@ -106,6 +106,6 @@ public class Delete extends AbstractCloudflareTask implements RunnableTask<VoidO
             throw new IllegalStateException("Failed to delete Worker script: " + envelope);
         }
 
-        return new VoidOutput();
+        return null;
     }
 }

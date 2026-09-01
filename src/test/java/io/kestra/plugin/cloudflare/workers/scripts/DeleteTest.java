@@ -21,6 +21,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -50,7 +51,11 @@ class DeleteTest {
             .scriptName(Property.ofValue("hello"))
             .build();
 
-        task.run(runContextFactory.of());
+        var output = task.run(runContextFactory.of());
+
+        // Kestra convention: a task with no outputs must return null, not VoidOutput, or
+        // Jackson serialization fails on Kestra 2.0 and the execution hangs in RUNNING forever.
+        assertNull(output);
 
         verify(
             deleteRequestedFor(urlEqualTo("/accounts/acct-1/workers/scripts/hello"))
