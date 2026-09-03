@@ -4,7 +4,7 @@ Manage Cloudflare zones, DNS records, cache, WAF rules, D1 databases, Workers, a
 
 ## Authentication
 
-Set `apiToken` (required) to a Cloudflare API token with the appropriate permissions. Optionally override `baseUrl` (default `https://api.cloudflare.com/client/v4`). Store secrets in [secrets](https://kestra.io/docs/concepts/secret) and apply connection properties globally with [plugin defaults](https://kestra.io/docs/workflow-components/plugin-defaults).
+Set `apiToken` (required) to a Cloudflare API token with the appropriate permissions. Optionally override `baseUrl` (default `https://api.cloudflare.com/client/v4`). Store secrets in [secrets](https://kestra.io/docs/concepts/secret) and set connection properties on each task.
 
 ## Tasks
 
