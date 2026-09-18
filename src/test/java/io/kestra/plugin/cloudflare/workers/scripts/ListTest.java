@@ -9,6 +9,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 
+import io.kestra.core.exceptions.KilledException;
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.common.FetchType;
@@ -20,6 +21,7 @@ import io.kestra.core.tenant.TenantService;
 import jakarta.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -250,5 +252,20 @@ class ListTest {
             assertNotNull(rows);
             assertEquals(2, rows.size());
         }
+    }
+
+    @Test
+    void shouldFailWithoutCallingCloudflareWhenKilledBeforeRun() {
+        var task = List.builder()
+            .apiToken(Property.ofValue("test-token"))
+            .baseUrl(Property.ofValue(BASE_URL))
+            .accountId(Property.ofValue("acct-1"))
+            .build();
+
+        task.kill();
+
+        var ex = assertThrows(KilledException.class, () -> task.run(runContextFactory.of()));
+        assertEquals("Worker script listing was cancelled", ex.getMessage());
+        verify(exactly(0), getRequestedFor(urlPathEqualTo("/accounts/acct-1/workers/scripts")));
     }
 }

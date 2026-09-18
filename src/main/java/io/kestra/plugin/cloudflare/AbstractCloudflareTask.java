@@ -3,17 +3,22 @@ package io.kestra.plugin.cloudflare;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
+import io.kestra.core.exceptions.KilledException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
 import io.kestra.core.http.client.HttpClientException;
 import io.kestra.core.http.client.HttpClientResponseException;
+import io.kestra.core.models.WorkerJobLifecycle;
 import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
@@ -21,6 +26,7 @@ import io.kestra.plugin.cloudflare.models.CloudflareEnvelope;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,7 +39,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask {
+public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask implements WorkerJobLifecycle {
 
     @Schema(
         title = "Cloudflare API token",
@@ -50,6 +56,52 @@ public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask 
     @Builder.Default
     @PluginProperty(group = "connection")
     protected Property<String> baseUrl = Property.ofValue("https://api.cloudflare.com/client/v4");
+
+    // Runtime state, not part of the task definition: excluded from the builder (final + initialized),
+    // the JSON schema, equals/hashCode and toString. Counted down from the worker thread that kills the
+    // job, awaited by the thread running run(). Never reset in run(): a retry deserializes a fresh task
+    // instance, so resetting would only swallow a kill() delivered just before that run() call.
+    @JsonIgnore
+    @Getter(AccessLevel.NONE)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private final CountDownLatch cancelLatch = new CountDownLatch(1);
+
+    // stop() stays the WorkerJobLifecycle no-op, as every RunnableTask in core does: it is the graceful
+    // drain signal and does not set killedState, so a task ending itself there is emitted as a real
+    // failure rather than resubmitted after the grace period.
+    // Cloudflare has no cancel endpoint here; per their D1 docs an in-progress export is cancelled once
+    // polling stops, so releasing the loop is the cancellation.
+    @Override
+    public void kill() {
+        this.cancelLatch.countDown();
+    }
+
+    private boolean isCancelled() {
+        return this.cancelLatch.getCount() == 0;
+    }
+
+    protected void throwIfCancelled(String resource) {
+        if (isCancelled()) {
+            throw new KilledException(resource + " was cancelled");
+        }
+    }
+
+    // Waits on the latch rather than sleeping, so a kill landing mid-backoff releases the loop at once
+    // instead of waiting out the remaining delay.
+    protected void awaitOrCancel(long delayMs, String resource) {
+        try {
+            if (this.cancelLatch.await(delayMs, TimeUnit.MILLISECONDS)) {
+                throw new KilledException(resource + " was cancelled");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            // kill() interrupts the worker thread right after counting the latch down, but a shutdown
+            // interrupt or a task timeout arrives without it, and those are failures, not cancellations.
+            throwIfCancelled(resource);
+            throw new IllegalStateException("Interrupted while waiting for " + resource, e);
+        }
+    }
 
     protected void addAuthHeader(RunContext runContext, HttpRequest.HttpRequestBuilder requestBuilder)
         throws IllegalVariableEvaluationException {

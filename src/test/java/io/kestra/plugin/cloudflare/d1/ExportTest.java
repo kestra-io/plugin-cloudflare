@@ -2,6 +2,9 @@ package io.kestra.plugin.cloudflare.d1;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -10,6 +13,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
+import io.kestra.core.exceptions.KilledException;
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
@@ -258,5 +262,70 @@ class ExportTest {
         var message = ex.getMessage() == null ? "" : ex.getMessage();
         assertTrue(message.contains("7003"), "missing error code in: " + message);
         assertTrue(message.contains("Database not found"), "missing error message in: " + message);
+    }
+
+    @Test
+    void shouldStopPollingWhenKilled() {
+        // The export never leaves "active", so the poll loop only ends on cancellation.
+        stubFor(
+            post(urlEqualTo(EXPORT_PATH))
+                .willReturn(okJson("""
+                    {
+                      "success": true,
+                      "errors": [],
+                      "messages": [],
+                      "result": {
+                        "status": "active",
+                        "at_bookmark": "bookmark-xyz"
+                      }
+                    }
+                    """))
+        );
+
+        var task = Export.builder()
+            .apiToken(Property.ofValue("test-token"))
+            .baseUrl(Property.ofValue("http://localhost:28282"))
+            .accountId(Property.ofValue("test-account"))
+            .databaseId(Property.ofValue(DB_UUID))
+            .maxDuration(Property.ofValue(Duration.ofMinutes(5)))
+            .build();
+
+        var runContext = runContextFactory.of();
+        var executor = Executors.newSingleThreadExecutor();
+
+        try {
+            var future = executor.submit(() -> task.run(runContext));
+
+            // 3 requests in means the backoff has grown to 2s, so waiting it out would be visible here.
+            awaitExportRequests(3);
+
+            long killedAt = System.nanoTime();
+            task.kill();
+
+            var ex = assertThrows(ExecutionException.class, () -> future.get(10, TimeUnit.SECONDS));
+            long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - killedAt);
+
+            assertInstanceOf(KilledException.class, ex.getCause());
+            assertEquals("D1 export was cancelled", ex.getCause().getMessage());
+            assertTrue(elapsedMs < 1_500, "Expected the kill to release the backoff at once, took " + elapsedMs + "ms");
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    private static void awaitExportRequests(int expected) {
+        var deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+
+        while (findAll(postRequestedFor(urlEqualTo(EXPORT_PATH))).size() < expected) {
+            if (System.nanoTime() > deadline) {
+                fail("Timed out waiting for " + expected + " requests to " + EXPORT_PATH);
+            }
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                fail("Interrupted while waiting for requests to " + EXPORT_PATH);
+            }
+        }
     }
 }
