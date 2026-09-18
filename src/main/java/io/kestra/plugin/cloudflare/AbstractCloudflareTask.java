@@ -65,7 +65,7 @@ public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask 
     @Getter(AccessLevel.NONE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private final CountDownLatch cancelLatch = new CountDownLatch(1);
+    private final CountDownLatch cancelSignal = new CountDownLatch(1);
 
     // stop() stays the WorkerJobLifecycle no-op, as every RunnableTask in core does: it is the graceful
     // drain signal and does not set killedState, so a task ending itself there is emitted as a real
@@ -74,11 +74,11 @@ public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask 
     // polling stops, so releasing the loop is the cancellation.
     @Override
     public void kill() {
-        this.cancelLatch.countDown();
+        this.cancelSignal.countDown();
     }
 
     private boolean isCancelled() {
-        return this.cancelLatch.getCount() == 0;
+        return this.cancelSignal.getCount() == 0;
     }
 
     protected void throwIfCancelled(String resource) {
@@ -91,7 +91,7 @@ public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask 
     // instead of waiting out the remaining delay.
     protected void awaitOrCancel(long delayMs, String resource) {
         try {
-            if (this.cancelLatch.await(delayMs, TimeUnit.MILLISECONDS)) {
+            if (this.cancelSignal.await(delayMs, TimeUnit.MILLISECONDS)) {
                 throw new KilledException(resource + " was cancelled");
             }
         } catch (InterruptedException e) {

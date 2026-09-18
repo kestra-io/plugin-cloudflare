@@ -227,8 +227,8 @@ class ListDatabasesTest {
 
         var serialized = JacksonMapper.ofJson().writeValueAsString(task);
 
-        assertFalse(serialized.contains("cancelLatch"), "Lifecycle state leaked into the serialized task: " + serialized);
-        assertFalse(task.toString().contains("cancelLatch"), "Lifecycle state leaked into toString(): " + task);
+        assertFalse(serialized.contains("cancelSignal"), "Lifecycle state leaked into the serialized task: " + serialized);
+        assertFalse(task.toString().contains("cancelSignal"), "Lifecycle state leaked into toString(): " + task);
     }
 
     @Test
