@@ -136,6 +136,8 @@ public class Export extends AbstractCloudflareTask implements RunnableTask<Expor
         int attempt = 0;
 
         while (true) {
+            throwIfCancelled("D1 export");
+
             var pollResult = envelope.result();
 
             if (pollResult != null && "complete".equalsIgnoreCase(pollResult.status())) {
@@ -173,12 +175,7 @@ public class Export extends AbstractCloudflareTask implements RunnableTask<Expor
             attempt++;
             logger.debug("Export not ready yet (attempt {}), retrying in {}ms", attempt, delayMs);
 
-            try {
-                Thread.sleep(delayMs);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted while waiting for D1 export", e);
-            }
+            awaitOrCancel(delayMs, "D1 export");
 
             delayMs = Math.min(delayMs * 2, BACKOFF_CAP_MS);
 

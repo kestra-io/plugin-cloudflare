@@ -113,6 +113,8 @@ public class ListDatabases extends AbstractCloudflareTask implements RunnableTas
         int page = 1;
 
         while (true) {
+            throwIfCancelled("D1 database listing");
+
             var uriBuilder = new StringBuilder(baseEndpoint)
                 .append("?per_page=").append(rPerPage)
                 .append("&page=").append(page);

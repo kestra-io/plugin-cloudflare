@@ -120,6 +120,8 @@ public class List extends AbstractCloudflareTask implements RunnableTask<FetchOu
                 boolean stop = false;
 
                 do {
+                    throwIfCancelled("Worker script listing");
+
                     var uri = rBaseUrl + "/accounts/" + encodePathSegment(rAccountId) + "/workers/scripts"
                         + (cursor != null ? "?cursor=" + encodePathSegment(cursor) : "");
 

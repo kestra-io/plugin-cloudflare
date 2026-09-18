@@ -163,6 +163,10 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
             throw new IllegalStateException("One of 'from' or 'sql' must be set");
         }
 
+        // Building the dump and uploading it can each run for minutes, so bound them explicitly rather
+        // than relying on the thread interrupt reaching the HTTP client.
+        throwIfCancelled("D1 import");
+
         var tempFile = buildTempFile(runContext, rFrom, rSql);
         var etag = computeMd5Hex(tempFile);
 
@@ -196,8 +200,12 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
             throw new IllegalStateException("D1 import init did not return an upload_url");
         }
 
+        throwIfCancelled("D1 import");
+
         logger.info("Uploading SQL to presigned URL (filename={})", filename);
         uploadToR2(runContext, uploadUrl, tempFile);
+
+        throwIfCancelled("D1 import");
 
         logger.info("Ingesting uploaded file");
 
@@ -237,6 +245,8 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
         var pollEnvelope = ingestEnvelope;
 
         while (true) {
+            throwIfCancelled("D1 import");
+
             if (Instant.now().isAfter(deadline)) {
                 throw new IllegalStateException(
                     "D1 import did not complete within " + rMaxDuration + " after " + attempt + " poll attempts"
@@ -246,12 +256,7 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
             attempt++;
             logger.debug("Import not ready yet (attempt {}), retrying in {}ms", attempt, delayMs);
 
-            try {
-                Thread.sleep(delayMs);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted while waiting for D1 import", e);
-            }
+            awaitOrCancel(delayMs, "D1 import");
 
             delayMs = Math.min(delayMs * 2, BACKOFF_CAP_MS);
 
