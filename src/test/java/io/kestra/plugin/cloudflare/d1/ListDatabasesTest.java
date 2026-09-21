@@ -1,14 +1,20 @@
 package io.kestra.plugin.cloudflare.d1;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 
+import io.kestra.core.exceptions.KilledException;
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
+import io.kestra.core.serializers.JacksonMapper;
 
 import jakarta.inject.Inject;
 
@@ -20,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @KestraTest
 @Execution(ExecutionMode.SAME_THREAD)
 class ListDatabasesTest {
+
+    private static final String DATABASE_PATH = "/accounts/test-account/d1/database";
 
     @Inject
     RunContextFactory runContextFactory;
@@ -210,5 +218,138 @@ class ListDatabasesTest {
         var message = ex.getMessage() == null ? "" : ex.getMessage();
         assertTrue(message.contains("7003"), "missing error code in: " + message);
         assertTrue(message.contains("Database not found"), "missing error message in: " + message);
+    }
+
+    @Test
+    void shouldKeepLifecycleStateOutOfTheSerializedTask() throws Exception {
+        var task = killableTask();
+        task.kill();
+
+        var serialized = JacksonMapper.ofJson().writeValueAsString(task);
+
+        assertFalse(serialized.contains("cancelSignal"), "Lifecycle state leaked into the serialized task: " + serialized);
+        assertFalse(task.toString().contains("cancelSignal"), "Lifecycle state leaked into toString(): " + task);
+    }
+
+    @Test
+    void shouldTreatRepeatedKillsAsIdempotent() {
+        var task = killableTask();
+
+        task.kill();
+        task.kill();
+
+        var ex = assertThrows(KilledException.class, () -> task.run(runContextFactory.of()));
+        assertEquals("D1 database listing was cancelled", ex.getMessage());
+        verify(exactly(0), getRequestedFor(urlPathEqualTo(DATABASE_PATH)));
+    }
+
+    @Test
+    void shouldNotCancelOnStop() {
+        // stop() is the graceful-shutdown drain signal and does not set killedState, so ending the task
+        // there would be reported as a genuine failure rather than resubmitted. It must stay a no-op.
+        stubFor(
+            get(urlPathEqualTo(DATABASE_PATH))
+                .willReturn(okJson("""
+                    {
+                      "success": true,
+                      "errors": [],
+                      "messages": [],
+                      "result": [
+                        {"uuid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "name": "prod-db", "version": "alpha", "num_tables": 5}
+                      ],
+                      "result_info": {"page": 1, "per_page": 100, "count": 1, "total_count": 1}
+                    }
+                    """))
+        );
+
+        var task = killableTask();
+        task.stop();
+
+        var output = assertDoesNotThrow(() -> task.run(runContextFactory.of()));
+        assertEquals(1, output.getTotal());
+    }
+
+    @Test
+    void shouldFailWithoutCallingCloudflareWhenKilledBeforeRun() {
+        var task = ListDatabases.builder()
+            .apiToken(Property.ofValue("test-token"))
+            .baseUrl(Property.ofValue("http://localhost:28282"))
+            .accountId(Property.ofValue("test-account"))
+            .build();
+
+        task.kill();
+
+        var ex = assertThrows(KilledException.class, () -> task.run(runContextFactory.of()));
+        assertEquals("D1 database listing was cancelled", ex.getMessage());
+        verify(exactly(0), getRequestedFor(urlPathEqualTo(DATABASE_PATH)));
+    }
+
+    @Test
+    void shouldStopPaginatingWhenKilled() {
+        // Every page comes back full with the total far ahead, so only a kill ends the loop.
+        stubFor(
+            get(urlPathEqualTo(DATABASE_PATH))
+                .willReturn(
+                    okJson("""
+                        {
+                          "success": true,
+                          "errors": [],
+                          "messages": [],
+                          "result": [
+                            {"uuid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "name": "db-1", "version": "alpha", "num_tables": 1},
+                            {"uuid": "11111111-2222-3333-4444-555555555555", "name": "db-2", "version": "alpha", "num_tables": 1}
+                          ],
+                          "result_info": {"page": 1, "per_page": 2, "count": 2, "total_count": 1000000}
+                        }
+                        """).withFixedDelay(50)
+                )
+        );
+
+        var task = ListDatabases.builder()
+            .apiToken(Property.ofValue("test-token"))
+            .baseUrl(Property.ofValue("http://localhost:28282"))
+            .accountId(Property.ofValue("test-account"))
+            .perPage(Property.ofValue(2))
+            .build();
+
+        var runContext = runContextFactory.of();
+        var executor = Executors.newSingleThreadExecutor();
+
+        try {
+            var future = executor.submit(() -> task.run(runContext));
+
+            awaitRequests(2);
+            task.kill();
+
+            var ex = assertThrows(ExecutionException.class, () -> future.get(10, TimeUnit.SECONDS));
+            assertInstanceOf(KilledException.class, ex.getCause());
+            assertEquals("D1 database listing was cancelled", ex.getCause().getMessage());
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    private static ListDatabases killableTask() {
+        return ListDatabases.builder()
+            .apiToken(Property.ofValue("test-token"))
+            .baseUrl(Property.ofValue("http://localhost:28282"))
+            .accountId(Property.ofValue("test-account"))
+            .build();
+    }
+
+    private static void awaitRequests(int expected) {
+        var deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+
+        while (findAll(getRequestedFor(urlPathEqualTo(DATABASE_PATH))).size() < expected) {
+            if (System.nanoTime() > deadline) {
+                fail("Timed out waiting for " + expected + " requests to " + DATABASE_PATH);
+            }
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                fail("Interrupted while waiting for requests to " + DATABASE_PATH);
+            }
+        }
     }
 }

@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -12,6 +15,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
+import io.kestra.core.exceptions.KilledException;
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContextFactory;
@@ -52,6 +56,19 @@ class ImportTest {
                 "rows_written": 2
               }
             }
+          }
+        }
+        """;
+
+    private static final String ACTIVE_RESPONSE = """
+        {
+          "success": true,
+          "errors": [],
+          "messages": [],
+          "result": {
+            "status": "active",
+            "at_bookmark": "bookmark-1",
+            "messages": []
           }
         }
         """;
@@ -436,5 +453,82 @@ class ImportTest {
 
         var ex = assertThrows(IllegalStateException.class, () -> task.run(runContextFactory.of()));
         assertTrue(ex.getMessage().contains("must be set"), "Expected required field message: " + ex.getMessage());
+    }
+
+    @Test
+    void shouldStopPollingWhenKilled() {
+        stubFor(
+            post(urlEqualTo(IMPORT_PATH))
+                .withRequestBody(matchingJsonPath("$.action", equalTo("init")))
+                .willReturn(okJson("""
+                    {
+                      "success": true,
+                      "errors": [],
+                      "messages": [],
+                      "result": {
+                        "upload_url": "%s",
+                        "filename": "%s"
+                      }
+                    }
+                    """.formatted(UPLOAD_URL, FILENAME)))
+        );
+
+        stubFor(put(urlEqualTo(UPLOAD_PATH)).willReturn(aResponse().withStatus(200)));
+
+        // The import never leaves "active", so the poll loop only ends on cancellation.
+        stubFor(
+            post(urlEqualTo(IMPORT_PATH))
+                .withRequestBody(matchingJsonPath("$.action", equalTo("ingest")))
+                .willReturn(okJson(ACTIVE_RESPONSE))
+        );
+
+        stubFor(
+            post(urlEqualTo(IMPORT_PATH))
+                .withRequestBody(matchingJsonPath("$.action", equalTo("poll")))
+                .willReturn(okJson(ACTIVE_RESPONSE))
+        );
+
+        var task = Import.builder()
+            .apiToken(Property.ofValue("test-token"))
+            .baseUrl(Property.ofValue("http://localhost:28282"))
+            .accountId(Property.ofValue("test-account"))
+            .databaseId(Property.ofValue(DB_UUID))
+            .sql(Property.ofValue("INSERT INTO t VALUES (42);"))
+            .maxDuration(Property.ofValue(Duration.ofMinutes(5)))
+            .build();
+
+        var runContext = runContextFactory.of();
+        var executor = Executors.newSingleThreadExecutor();
+
+        try {
+            var future = executor.submit(() -> task.run(runContext));
+
+            awaitPollRequests(2);
+            task.kill();
+
+            var ex = assertThrows(ExecutionException.class, () -> future.get(10, TimeUnit.SECONDS));
+            assertInstanceOf(KilledException.class, ex.getCause());
+            assertEquals("D1 import was cancelled", ex.getCause().getMessage());
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    private static void awaitPollRequests(int expected) {
+        var deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        var pattern = postRequestedFor(urlEqualTo(IMPORT_PATH))
+            .withRequestBody(matchingJsonPath("$.action", equalTo("poll")));
+
+        while (findAll(pattern).size() < expected) {
+            if (System.nanoTime() > deadline) {
+                fail("Timed out waiting for " + expected + " poll requests to " + IMPORT_PATH);
+            }
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                fail("Interrupted while waiting for poll requests to " + IMPORT_PATH);
+            }
+        }
     }
 }
