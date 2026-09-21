@@ -1,6 +1,8 @@
 package io.kestra.plugin.cloudflare;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -96,11 +98,28 @@ public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask 
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            // kill() interrupts the worker thread right after counting the latch down, but a shutdown
-            // interrupt or a task timeout arrives without it, and those are failures, not cancellations.
+            // A kill counts the latch down before interrupting. A shutdown interrupt does not, and neither
+            // does a timeout: Failsafe interrupts first and core only calls task.kill() once run() unwound.
             throwIfCancelled(resource);
             throw new IllegalStateException("Interrupted while waiting for " + resource, e);
         }
+    }
+
+    // Checks the latch on every read, so a kill lands during a long transfer instead of only at its edges.
+    protected InputStream cancellable(InputStream delegate, String resource) {
+        return new FilterInputStream(delegate) {
+            @Override
+            public int read() throws IOException {
+                throwIfCancelled(resource);
+                return super.read();
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                throwIfCancelled(resource);
+                return super.read(b, off, len);
+            }
+        };
     }
 
     protected void addAuthHeader(RunContext runContext, HttpRequest.HttpRequestBuilder requestBuilder)

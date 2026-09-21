@@ -163,8 +163,8 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
             throw new IllegalStateException("One of 'from' or 'sql' must be set");
         }
 
-        // Building the dump and uploading it can each run for minutes, so bound them explicitly rather
-        // than relying on the thread interrupt reaching the HTTP client.
+        // Building the dump and uploading it can each run for minutes, so both read through a stream that
+        // observes the latch, rather than relying on the thread interrupt reaching the HTTP client.
         throwIfCancelled("D1 import");
 
         var tempFile = buildTempFile(runContext, rFrom, rSql);
@@ -301,7 +301,7 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
             var tempFile = runContext.workingDir().createTempFile(".sql");
             if (rFrom != null) {
                 try (
-                    var in = runContext.storage().getFile(URI.create(rFrom));
+                    var in = cancellable(runContext.storage().getFile(URI.create(rFrom)), "D1 import");
                     var out = Files.newOutputStream(tempFile)
                 ) {
                     in.transferTo(out);
@@ -311,6 +311,7 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
             }
             return tempFile;
         } catch (IOException e) {
+            throwIfCancelled("D1 import");
             throw new RuntimeException("Failed to prepare SQL temp file", e);
         }
     }
@@ -340,12 +341,14 @@ public class Import extends AbstractCloudflareTask implements RunnableTask<Impor
                 .uri(URI.create(uploadUrl))
                 .body(
                     HttpRequest.InputStreamRequestBody.builder()
-                        .content(Files.newInputStream(file))
+                        .content(cancellable(Files.newInputStream(file), "D1 import"))
                         .build()
                 )
                 .build();
             client.request(request, String.class);
         } catch (IOException | IllegalVariableEvaluationException | HttpClientException e) {
+            // The client may wrap the KilledException thrown from the stream, so recheck before masking it.
+            throwIfCancelled("D1 import");
             throw new RuntimeException("Failed to upload SQL to R2 presigned URL", e);
         }
     }
