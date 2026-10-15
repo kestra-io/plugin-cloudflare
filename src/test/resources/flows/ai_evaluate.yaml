@@ -1,0 +1,43 @@
+id: ai_evaluate
+namespace: company.team
+
+tasks:
+  - id: evaluate
+    type: io.kestra.plugin.cloudflare.ai.Evaluate
+    baseUrl: "http://localhost:28206"
+    accountId: test-account
+    apiToken: test-token
+    model: CLEF_FLASH
+    state:
+      customer: acme
+      message: "Checkout is down for {{ flow.namespace }}"
+    questions:
+      urgent:
+        type: NOUL
+        instructions: Is this incident urgent?
+        criteria:
+          true: Customers are blocked
+          false: Cosmetic issue
+      team:
+        type: CHOICE
+        instructions: Which team should handle this request?
+        criteria:
+          billing: Payments, invoices, and refunds
+          technical: Outages, errors, and configuration
+          other: ""
+      severity:
+        type: SCORE
+        instructions: How severe is the customer impact?
+        criteria:
+          - No impact
+          - Minor
+          - Major
+          - Critical
+
+  - id: gate
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{ outputs.evaluate.answers.urgent.noul > 0.8 and outputs.evaluate.answers.severity.score >= 2 }}"
+    then:
+      - id: route
+        type: io.kestra.plugin.core.debug.Return
+        format: "{{ outputs.evaluate.answers.team.choice }}"

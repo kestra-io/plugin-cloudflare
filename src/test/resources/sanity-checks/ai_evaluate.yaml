@@ -1,0 +1,35 @@
+# Requires a live Cloudflare account and an API token with Workers AI permission; exercised only via the disabled EvaluateRunnerTest.
+id: ai_evaluate
+namespace: company.team
+
+tasks:
+  - id: evaluate
+    type: io.kestra.plugin.cloudflare.ai.Evaluate
+    apiToken: "{{ secret('CLOUDFLARE_API_TOKEN') }}"
+    accountId: "{{ secret('CLOUDFLARE_ACCOUNT_ID') }}"
+    state: "Checkout has been down for all customers for 20 minutes."
+    questions:
+      urgent:
+        type: NOUL
+        instructions: Is this incident urgent?
+      team:
+        type: CHOICE
+        instructions: Which team should handle this request?
+        criteria:
+          billing: Payments, invoices, and refunds
+          technical: Outages, errors, and configuration
+      severity:
+        type: SCORE
+        instructions: How severe is the customer impact?
+        criteria:
+          - No impact
+          - Minor
+          - Major
+          - Critical
+
+  - id: assert
+    type: io.kestra.plugin.core.execution.Assert
+    conditions:
+      - "{{ outputs.evaluate.answers.urgent.noul >= 0 and outputs.evaluate.answers.urgent.noul <= 1 }}"
+      - "{{ outputs.evaluate.answers.team.choice == 'billing' or outputs.evaluate.answers.team.choice == 'technical' }}"
+      - "{{ outputs.evaluate.answers.severity.score >= 0 and outputs.evaluate.answers.severity.score <= 3 }}"

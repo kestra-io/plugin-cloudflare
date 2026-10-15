@@ -3,11 +3,11 @@
 ## What
 
 - Provides plugin components under `io.kestra.plugin.cloudflare`.
-- Includes classes such as `CloudflareEnvelope`, `List`, `Get`, `Purge`.
+- Includes classes such as `CloudflareEnvelope`, `List`, `Get`, `Purge`, `Evaluate`.
 
 ## Why
 
-- What user problem does this solve? Teams need to manage Cloudflare zones, DNS records, and cache operations from orchestrated workflows instead of relying on manual console work, ad hoc scripts, or disconnected schedulers.
+- What user problem does this solve? Teams need to manage Cloudflare zones, DNS records, and cache operations, and to route on Workers AI decisions, from orchestrated workflows instead of relying on manual console work, ad hoc scripts, or disconnected schedulers.
 - Why would a team adopt this plugin in a workflow? It keeps Cloudflare steps in the same Kestra flow as upstream preparation, approvals, retries, notifications, and downstream systems.
 - What operational/business outcome does it enable? It reduces manual handoffs and fragmented tooling while improving reliability, traceability, and delivery speed for processes that depend on Cloudflare.
 
@@ -25,6 +25,7 @@ Infrastructure dependencies (Docker Compose services):
 
 ### Key Plugin Classes
 
+- `io.kestra.plugin.cloudflare.ai.Evaluate`
 - `io.kestra.plugin.cloudflare.cache.Purge`
 - `io.kestra.plugin.cloudflare.compute.kv.Get`
 - `io.kestra.plugin.cloudflare.compute.kv.Write`

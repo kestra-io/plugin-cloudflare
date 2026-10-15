@@ -1,0 +1,8 @@
+group: io.kestra.plugin.cloudflare.ai
+name: "ai"
+title: "Cloudflare Workers AI"
+description: "Tasks that evaluate content with Cloudflare's Clef decision models on Workers AI."
+body: "Send a state and typed questions (yes/no, choice, or score) to the Clef and Clef-flash decision models and get one answer per question with calibrated probabilities. Route flows on the result, for example ticket triage or content moderation, without generating text or parsing LLM output."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"

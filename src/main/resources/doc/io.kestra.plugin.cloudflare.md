@@ -1,6 +1,6 @@
 # How to use the Cloudflare plugin
 
-Manage Cloudflare zones, DNS records, cache, WAF rules, D1 databases, Workers, and Workers KV from Kestra flows.
+Manage Cloudflare zones, DNS records, cache, WAF rules, D1 databases, Workers, and Workers KV from Kestra flows, and evaluate content with Workers AI decision models.
 
 ## Authentication
 
@@ -71,6 +71,27 @@ Set `apiToken` (required) to a Cloudflare API token with the appropriate permiss
 `workers.scripts.List` lists all Worker scripts on an account — set `accountId` (required); Cloudflare cursor pagination is followed internally.
 
 `workers.scripts.Delete` deletes a Worker script — set `accountId` and `scriptName` (both required). Set `force: true` to delete a script still referenced by routes.
+
+### Workers AI
+
+`ai.Evaluate` sends a state and typed questions to a Clef decision model and returns one answer per question - set `accountId`, `state`, and `questions` (all required).
+The API token needs the Workers AI permission.
+Optionally set `model` (default `CLEF`; values: `CLEF`, `CLEF_FLASH`).
+
+`state` is a string, an object, or an array.
+Write structured state as a YAML map or list; its keys are kept as written and each value is rendered on its own, as text.
+An expression such as `{{ trigger.body }}` always renders to text, even when the result is valid JSON.
+`questions` is a map of 1 to 64 entries keyed by an id you choose; each question sets `type`, `instructions`, and `criteria`:
+
+- `NOUL` asks a yes/no question. `criteria` is optional: a map with the keys `true` and `false` describing what a yes and a no mean.
+- `CHOICE` picks one option. `criteria` is a map of option name to description, or a list of option names, with 2 to 255 options. In a map, use an empty string for an option without a description.
+- `SCORE` rates along ordered levels. `criteria` is a list of 2 to 10 level descriptions, lowest first.
+
+The output includes `model` and an `answers` map keyed by question id.
+Every answer has a `type`, and the other fields depend on it: `NOUL` sets `noul` (probability of yes), `CHOICE` sets `choice`, `probabilities`, and `confidence`, and `SCORE` sets `score` (0 is the lowest level), `legend`, `probabilities`, and `confidence`.
+For example, route on `{{ outputs.classify.answers.team.choice }}` or gate on `{{ outputs.evaluate.answers.urgent.noul > 0.8 }}`.
+
+Token usage is reported as the `input.tokens` and `output.tokens` metrics.
 
 ### WAF
 

@@ -1,8 +1,8 @@
 group: io.kestra.plugin.cloudflare
 name: "cloudflare"
 title: "Cloudflare"
-description: "Tasks that manage Cloudflare zones, DNS records, cache, Workers, and D1 databases."
-body: "Create, update, list, and delete Cloudflare zones and DNS records. Purge zone cache, deploy and manage Worker scripts, run inline code on the edge via Dynamic Workers, and manage D1 serverless SQLite databases including SQL queries and exports. Automate Cloudflare infrastructure operations securely using API tokens."
+description: "Tasks that manage Cloudflare zones, DNS records, cache, Workers, and D1 databases, and evaluate content with Workers AI."
+body: "Create, update, list, and delete Cloudflare zones and DNS records. Purge zone cache, deploy and manage Worker scripts, run inline code on the edge via Dynamic Workers, and manage D1 serverless SQLite databases including SQL queries and exports. Evaluate content with Clef decision models on Workers AI to route flows on a yes/no, a choice, or a score. Automate Cloudflare infrastructure operations securely using API tokens."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"

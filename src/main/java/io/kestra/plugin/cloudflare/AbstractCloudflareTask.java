@@ -45,10 +45,11 @@ public abstract class AbstractCloudflareTask extends AbstractCloudflareHttpTask 
 
     @Schema(
         title = "Cloudflare API token",
-        description = "Your Cloudflare API token. Create one in the Cloudflare dashboard with the permissions required by the resources you manage (e.g. DNS, Workers, D1, cache, WAF, zones)."
+        description = "Your Cloudflare API token. Create one in the Cloudflare dashboard with the permissions required by the resources you manage (e.g. DNS, Workers, Workers AI, D1, cache, WAF, zones)."
     )
     @NotNull
     @PluginProperty(secret = true, group = "connection")
+    @ToString.Exclude
     protected Property<String> apiToken;
 
     @Schema(
