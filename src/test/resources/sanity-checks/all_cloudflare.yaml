@@ -1,0 +1,16 @@
+# Needs a live Cloudflare account and API token, so it is on the skip list in kestra-io/sanity-checks.
+id: all_cloudflare
+namespace: company.team
+
+tasks:
+  - id: loop
+    type: io.kestra.plugin.core.flow.Loop
+    values:
+      - ai_evaluate
+      - workers_scripts_list
+      - workers_dynamic_run
+    tasks:
+      - id: subflow
+        type: io.kestra.plugin.core.flow.Subflow
+        flowId: "{{ item.value }}"
+        namespace: "{{ flow.namespace }}"
